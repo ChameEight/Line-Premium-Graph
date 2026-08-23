@@ -388,6 +388,40 @@
             color: #555;
             font-weight: bold;
         }
+
+        .ranking-filter-summary {
+            width: 100%;
+            box-sizing: border-box;
+            text-align: right;
+            margin: 2px 0 10px;
+            font-size: 0.78rem;
+            line-height: 1.4;
+            color: #777;
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+
+        .ranking-filter-summary .summary-prefix {
+            font-weight: bold;
+            color: #666;
+        }
+
+        .chart-filter-summary {
+            width: 100%;
+            box-sizing: border-box;
+            text-align: right;
+            margin: 2px 0 10px;
+            font-size: 0.78rem;
+            line-height: 1.4;
+            color: #777;
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+
+        .chart-filter-summary .summary-prefix {
+            font-weight: bold;
+            color: #666;
+        }
         @media (max-width: 900px) {
             .upload-grid { grid-template-columns: 1fr; }
             #summary-area, .chart-section { max-width: 100%; }
@@ -547,6 +581,7 @@
             </div>
         </div>
     </div>
+    <div id="chart1-filter-summary" class="chart-filter-summary" aria-live="polite"></div>
     <div class="chart-container">
         <canvas id="revenueChart"></canvas>
     </div>
@@ -587,6 +622,7 @@
             </div>
         </div>
     </div>
+    <div id="chart2-filter-summary" class="chart-filter-summary" aria-live="polite"></div>
     <div class="chart-container">
         <canvas id="premiumChart"></canvas>
     </div>
@@ -627,6 +663,7 @@
             </div>
         </div>
     </div>
+    <div id="chart3-filter-summary" class="chart-filter-summary" aria-live="polite"></div>
     <div class="chart-container">
         <canvas id="salesTypeChart"></canvas>
     </div>
@@ -646,7 +683,7 @@
                 <div class="chart-controls-row">
                     <div class="chart-radio-group">
                         <span style="font-size: 0.95rem; color: #555; font-weight: bold; margin-right: 5px;">商品:</span>
-                        <label><input type="radio" name="ranking-item-type" value="all" checked> 全商品</label>
+                        <label><input type="radio" name="ranking-item-type" value="all" checked> 全商品分</label>
                         <label><input type="radio" name="ranking-item-type" value="sticker"> スタンプ</label>
                         <label><input type="radio" name="ranking-item-type" value="emoji"> 絵文字</label>
                         <label><input type="radio" name="ranking-item-type" value="theme"> 着せ替え</label>
@@ -696,6 +733,7 @@
         <div class="show-all-wrapper" data-html2canvas-ignore="true">
             <label><input type="checkbox" id="show-all-4"> 全ランキングを見る</label>
         </div>
+        <div id="ranking-filter-summary-4" class="ranking-filter-summary" aria-live="polite"></div>
         <div class="chart-container"><canvas id="rankingChart"></canvas></div>
         
         <!-- ★ボタン群を画像化から除外 -->
@@ -716,6 +754,7 @@
         <div class="show-all-wrapper" data-html2canvas-ignore="true">
             <label><input type="checkbox" id="show-all-5"> 全ランキングを見る</label>
         </div>
+        <div id="ranking-filter-summary-5" class="ranking-filter-summary" aria-live="polite"></div>
         <div class="chart-container"><canvas id="premMonthRankingChart"></canvas></div>
         
         <!-- ★ボタン群を画像化から除外 -->
@@ -744,6 +783,7 @@
     <div class="show-all-wrapper" data-html2canvas-ignore="true">
         <label><input type="checkbox" id="show-all-6"> 全ランキングを見る</label>
     </div>
+    <div id="ranking-filter-summary-6" class="ranking-filter-summary" aria-live="polite"></div>
     <div class="chart-container"><canvas id="premMonthProductRankingChart"></canvas></div>
     
     <!-- ★ボタン群を画像化から除外 -->
@@ -1059,6 +1099,7 @@ setTimeout(() => {
         // --- 1つ目のグラフのUI制御（内訳ごとラジオのグレーアウトおよび連動切り替え） ---
         function updateChart1ControlsUI() {
             const viewType = document.querySelector('input[name="chart-type"]:checked').value;
+            updateChart1FilterSummary();
             const isColorCoded = colorCodeCheckbox.checked && !colorCodeCheckbox.disabled;
             const isDetailAvailable = (viewType === 'all' && isColorCoded);
 
@@ -2020,6 +2061,7 @@ setTimeout(() => {
             if (!startMonth) return;
             const sixMonths = generateSixMonths(startMonth);
             document.getElementById('end-month-display').textContent = sixMonths[5];
+            updateChart2FilterSummary(sixMonths[0], sixMonths[5]);
             drawPremiumChart(sixMonths);
         }
 
@@ -2031,6 +2073,7 @@ setTimeout(() => {
             const datasets = [];
             const viewType2 = document.querySelector('input[name="chart2-type"]:checked').value;
             const amountDisplayMode = document.querySelector('input[name="chart2-amount-display"]:checked').value; 
+            if (monthsLabels && monthsLabels.length > 0) updateChart2FilterSummary(monthsLabels[0], monthsLabels[monthsLabels.length - 1]);
             const propKey = viewType2 === 'all' ? 'total' : viewType2;
 
             const premDatesArray = Array.from(availablePremiumDates).sort((a, b) => {
@@ -2087,6 +2130,7 @@ setTimeout(() => {
             const viewType = document.querySelector('input[name="chart3-type"]:checked').value;
             const amountDisplayMode = document.querySelector('input[name="chart3-amount-display"]:checked').value;
             const filterValue = chart3PremiumStartFilter.value; 
+            updateChart3FilterSummary();
 
             const ctx = document.getElementById('salesTypeChart').getContext('2d');
             if (salesTypeChartInstance) salesTypeChartInstance.destroy();
@@ -2150,6 +2194,73 @@ setTimeout(() => {
             };
         }
 
+        // 4～6番グラフ共通：現在の絞り込み条件を画像にも写る形で表示
+        function formatRankingFilterMonth(monthValue) {
+            const match = String(monthValue || '').match(/^(\d{4})\/(\d{1,2})$/);
+            if (!match) return String(monthValue || '-');
+            return `${match[1].slice(2)}年${parseInt(match[2], 10)}月`;
+        }
+
+        function updateRankingFilterSummary(elementId, startMonth, endMonth, itemTypeFilter, salesTypeFilter) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+
+            const itemLabel = {
+                all: '全商品分',
+                sticker: 'スタンプのみ',
+                emoji: '絵文字のみ',
+                theme: '着せ替えのみ'
+            }[itemTypeFilter] || itemTypeFilter;
+
+            const salesLabel = {
+                all: '個別+プレミアム',
+                individual: '個別のみ',
+                premium: 'プレミアムのみ'
+            }[salesTypeFilter] || salesTypeFilter;
+
+            const startLabel = formatRankingFilterMonth(startMonth);
+            const endLabel = formatRankingFilterMonth(endMonth);
+            const periodLabel = startMonth === endMonth ? startLabel : `${startLabel}～${endLabel}`;
+
+            el.innerHTML = `<span class="summary-prefix">絞り込み：</span>${itemLabel}・${salesLabel}・${periodLabel}`;
+        }
+
+        function getChartFilterItemLabel(value) {
+            return {
+                all: '全商品分',
+                sticker: 'スタンプのみ',
+                emoji: '絵文字のみ',
+                theme: '着せ替えのみ'
+            }[value] || value || '-';
+        }
+
+        function updateChart1FilterSummary() {
+            const el = document.getElementById('chart1-filter-summary');
+            if (!el) return;
+            const viewType = document.querySelector('input[name="chart-type"]:checked')?.value || 'all';
+            el.innerHTML = `<span class="summary-prefix">絞り込み：</span>${getChartFilterItemLabel(viewType)}`;
+        }
+
+        function updateChart2FilterSummary(startMonth, endMonth) {
+            const el = document.getElementById('chart2-filter-summary');
+            if (!el) return;
+            const viewType = document.querySelector('input[name="chart2-type"]:checked')?.value || 'all';
+            const startLabel = formatRankingFilterMonth(startMonth);
+            const endLabel = formatRankingFilterMonth(endMonth);
+            const periodLabel = startMonth === endMonth ? startLabel : `${startLabel}～${endLabel}`;
+            el.innerHTML = `<span class="summary-prefix">絞り込み：</span>${getChartFilterItemLabel(viewType)}・${periodLabel}`;
+        }
+
+        function updateChart3FilterSummary() {
+            const el = document.getElementById('chart3-filter-summary');
+            if (!el) return;
+            const viewType = document.querySelector('input[name="chart3-type"]:checked')?.value || 'all';
+            const premiumMonth = chart3PremiumStartFilter.value || 'all';
+            const premiumLabel = premiumMonth === 'all' ? 'すべて' : formatRankingFilterMonth(premiumMonth);
+            el.innerHTML = `<span class="summary-prefix">絞り込み：</span>${getChartFilterItemLabel(viewType)}・プレミアム月：${premiumLabel}`;
+        }
+
+
         function sanitizeFileName(text) { return String(text).replace(/[\\/:*?"<>|]/g, '_'); }
 
         function formatRankingMetric(value) { return rankingCountCheckbox.checked ? Math.round(value || 0).toLocaleString('ja-JP') + '個' : '¥' + Math.round(value || 0).toLocaleString('ja-JP'); }
@@ -2212,6 +2323,7 @@ setTimeout(() => {
 
             if (!startMonth || !endMonth || Object.keys(rankingDataObj).length === 0) return;
             chartArea4.style.display = 'block';
+            updateRankingFilterSummary('ranking-filter-summary-4', startMonth, endMonth, itemTypeFilter, salesTypeFilter);
 
             document.getElementById('title-chart-4').textContent = showAll4.checked ? `商品${rankingCountCheckbox.checked ? '個数' : '売上'}ランキング (全件)` : `商品${rankingCountCheckbox.checked ? '個数' : '売上'}ランキング (Top 5)`;
 
@@ -2356,6 +2468,7 @@ if (datasets.length > 0 && amountDisplay === 'total') {
             const amountDisplay = document.querySelector('input[name="ranking-amount-display"]:checked').value;
 
             if (!startMonth || !endMonth || !premiumMonth || Object.keys(rankingDataObj).length === 0) return;
+            updateRankingFilterSummary('ranking-filter-summary-6', startMonth, endMonth, itemTypeFilter, salesTypeFilter);
             document.getElementById('title-chart-6').textContent = showAll6.checked ? `選択したプレミアム入り月の商品${rankingCountCheckbox.checked ? '個数' : '売上'}ランキング (全件)` : `選択したプレミアム入り月の商品${rankingCountCheckbox.checked ? '個数' : '売上'}ランキング (Top 5)`;
 
             const colorMap = {
@@ -2494,6 +2607,7 @@ scales: {
 
             if (!startMonth || !endMonth || Object.keys(premMonthRankingDataObj).length === 0) return;
             chartArea5.style.display = 'block';
+            updateRankingFilterSummary('ranking-filter-summary-5', startMonth, endMonth, itemTypeFilter, salesTypeFilter);
 
             document.getElementById('title-chart-5').textContent = showAll5.checked ? `プレミアム入り月別${rankingCountCheckbox.checked ? '個数' : '売上'}ランキング (全件)` : `プレミアム入り月別${rankingCountCheckbox.checked ? '個数' : '売上'}ランキング (Top 5)`;
 
