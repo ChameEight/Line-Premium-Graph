@@ -595,9 +595,8 @@
 </div>
 
 <div id="chart-area-2" class="chart-section">
-    <h2 class="step-title" style="text-align: center;">プレミアム開始日別 月別売上 (6ヶ月間)</h2>
-    
-    <!-- ★ここに追加：コントロール類を画像化から除外 -->
+    <h2 class="step-title" style="text-align: center;">プレミアム開始日別 月別売上 (6ヶ月間)</h2>    
+   
     <div class="chart-controls-wrapper" data-html2canvas-ignore="true">
         <div class="chart-controls-row">
             <div class="chart-radio-group">
@@ -605,6 +604,9 @@
                 <label><input type="radio" name="chart2-type" value="sticker"> スタンプ</label>
                 <label><input type="radio" name="chart2-type" value="emoji"> 絵文字</label>
                 <label><input type="radio" name="chart2-type" value="theme"> 着せ替え</label>
+            </div>
+	    <div class="chart-check-group">
+                <label><input type="checkbox" id="chart2-100percent-checkbox"> 100%積み上げ式にする</label>
             </div>
         </div>
         <div class="chart-controls-row" style="justify-content: space-between;">
@@ -626,7 +628,7 @@
     <div class="chart-container">
         <canvas id="premiumChart"></canvas>
     </div>
-    <!-- ★ここもそのまま：ボタン群を画像化から除外 -->
+    
     <div class="action-btn-container" data-html2canvas-ignore="true">
         <div class="export-btn-group">
             <button type="button" class="btn btn-sm btn-outline" onclick="exportChartImage('premiumChart', 'copy')">📋 画像コピー</button>
@@ -636,9 +638,8 @@
 </div>
 
 <div id="chart-area-3" class="chart-section">
-    <h2 class="step-title" style="text-align: center;">月別売上金額 (個別売上 vs プレミアム売上)</h2>
-    
-    <!-- ★ここに追加：コントロール類を画像化から除外 -->
+    <h2 class="step-title" style="text-align: center;">月別売上金額 (個別売上 vs プレミアム売上)</h2>    
+   
     <div class="chart-controls-wrapper" data-html2canvas-ignore="true">
         <div class="chart-controls-row">
             <div class="chart-radio-group">
@@ -666,8 +667,7 @@
     <div id="chart3-filter-summary" class="chart-filter-summary" aria-live="polite"></div>
     <div class="chart-container">
         <canvas id="salesTypeChart"></canvas>
-    </div>
-    <!-- ★ここもそのまま：ボタン群を画像化から除外 -->
+    </div>  
     <div class="action-btn-container" data-html2canvas-ignore="true">
         <div class="export-btn-group">
             <button type="button" class="btn btn-sm btn-outline" onclick="exportChartImage('salesTypeChart', 'copy')">📋 画像コピー</button>
@@ -1152,6 +1152,11 @@ setTimeout(() => {
         // --- 2つ目のグラフのイベントリスナー ---
         startMonthSelect.addEventListener('change', (e) => {
             updatePremiumChartUI(e.target.value);
+        });
+
+        // 100%積み上げ式チェックボックスの切り替えイベント
+        document.getElementById('chart2-100percent-checkbox').addEventListener('change', () => {
+            if (Object.keys(premiumDataObj).length > 0) updatePremiumChartUI(startMonthSelect.value);
         });
 
         chart2TypeRadios.forEach(radio => {
@@ -1795,7 +1800,7 @@ setTimeout(() => {
         'プレミアム絵文字金額',
         'プレミアム着せ替え金額',
         '合計プレミアム金額',
-        '合計売上総額'
+        '売上総額'
     ];
 
     const rows = [headers];
@@ -2073,6 +2078,7 @@ setTimeout(() => {
             const datasets = [];
             const viewType2 = document.querySelector('input[name="chart2-type"]:checked').value;
             const amountDisplayMode = document.querySelector('input[name="chart2-amount-display"]:checked').value; 
+            const is100Percent = document.getElementById('chart2-100percent-checkbox').checked; // ★追加：チェック状態の取得
             if (monthsLabels && monthsLabels.length > 0) updateChart2FilterSummary(monthsLabels[0], monthsLabels[monthsLabels.length - 1]);
             const propKey = viewType2 === 'all' ? 'total' : viewType2;
 
@@ -2085,13 +2091,51 @@ setTimeout(() => {
             const colorPalette = [ '#4dc9f6', '#f67019', '#f53794', '#537bc4', '#acc236', '#166a8f', '#00a950', '#58595b', '#8549ba', '#ffb300', '#005b96', '#ff8b94', '#2c3e50', '#e74c3c', '#27ae60' ];
             let colorIndex = 0;
 
+            // ★追加：100%計算のために各月の合計金額を事前に算出
+            const monthlyTotals = {};
+            monthsLabels.forEach(month => {
+                let monthTotal = 0;
+                premDatesArray.forEach(premCategory => {
+                    monthTotal += premiumDataObj[month] && premiumDataObj[month][premCategory] ? premiumDataObj[month][premCategory][propKey] : 0;
+                });
+                monthlyTotals[month] = monthTotal;
+            });
+
+            // ★変更：金額表示のカスタマイズ（%と金額の出し分け）
             const detailDatalabelsConfig = {
                 display: amountDisplayMode === 'detail', color: '#fff', font: { weight: 'bold', size: 10 },
-                formatter: (value) => value > 0 ? '¥' + value.toLocaleString() : '', anchor: 'center', align: 'center',
+                formatter: (value, context) => {
+                    const originalValue = context.dataset.originalData[context.dataIndex];
+                    if (originalValue <= 0) return '';
+                    return is100Percent ? value.toFixed(1) + '%' : '¥' + originalValue.toLocaleString();
+                },
+                anchor: 'center', align: 'center',
                 textShadowBlur: 3, textShadowColor: 'rgba(0,0,0,0.5)'
             };
 
-            let labelConfig = amountDisplayMode === 'detail' ? detailDatalabelsConfig : (amountDisplayMode === 'total' ? dynamicTotalDatalabelsConfig : { display: false });
+            const localTotalDatalabelsConfig = {
+                display: function(context) {
+                    const chart = context.chart;
+                    let lastVisible = -1;
+                    for (let i = chart.data.datasets.length - 1; i >= 0; i--) {
+                        if (chart.isDatasetVisible(i)) { lastVisible = i; break; }
+                    }
+                    return context.datasetIndex === lastVisible;
+                },
+                formatter: function(value, context) {
+                    const chart = context.chart;
+                    let sum = 0;
+                    for (let i = 0; i < chart.data.datasets.length; i++) {
+                        if (chart.isDatasetVisible(i)) sum += Number(chart.data.datasets[i].originalData[context.dataIndex]) || 0;
+                    }
+                    if (sum <= 0) return '';
+                    // 100%の時は元の売上合計額を「計 ¥〜」と表示する
+                    return (is100Percent ? '¥' : '¥') + sum.toLocaleString();
+                },
+                anchor: 'end', align: 'top', color: '#333', font: { weight: 'bold', size: 12 }, textShadowBlur: 0
+            };
+
+            let labelConfig = amountDisplayMode === 'detail' ? detailDatalabelsConfig : (amountDisplayMode === 'total' ? localTotalDatalabelsConfig : { display: false });
 
             premDatesArray.forEach(premCategory => {
                 let color;
@@ -2099,9 +2143,27 @@ setTimeout(() => {
                 else if (premCategory === '未設定') color = '#cccccc'; 
                 else { color = colorPalette[colorIndex % colorPalette.length]; colorIndex++; }
                 
-                const data = monthsLabels.map(month => premiumDataObj[month] && premiumDataObj[month][premCategory] ? premiumDataObj[month][premCategory][propKey] : 0);
-                if (data.some(val => val > 0)) {
-                    datasets.push({ label: premCategory, data: data, backgroundColor: color, borderWidth: 1, borderColor: '#ffffff', datalabels: labelConfig });
+                // ★変更：100%時はデータを割合（0〜100）に変換し、元の金額をoriginalDataとして保持
+                const originalData = monthsLabels.map(month => premiumDataObj[month] && premiumDataObj[month][premCategory] ? premiumDataObj[month][premCategory][propKey] : 0);
+                
+                let dataToUse = originalData;
+                if (is100Percent) {
+                    dataToUse = originalData.map((val, idx) => {
+                        const total = monthlyTotals[monthsLabels[idx]];
+                        return total > 0 ? (val / total) * 100 : 0;
+                    });
+                }
+
+                if (originalData.some(val => val > 0)) {
+                    datasets.push({ 
+                        label: premCategory, 
+                        data: dataToUse, 
+                        originalData: originalData, // ツールチップ等で参照するための元金額
+                        backgroundColor: color, 
+                        borderWidth: 1, 
+                        borderColor: '#ffffff', 
+                        datalabels: labelConfig 
+                    });
                 }
             });
 
@@ -2111,16 +2173,40 @@ setTimeout(() => {
                     responsive: true, maintainAspectRatio: false, layout: { padding: { top: 25 } }, 
                     plugins: {
                         legend: { position: 'right', reverse: true, labels: { boxWidth: 12, padding: 15 } },
-                        tooltip: { callbacks: { label: function(context) { return (context.dataset.label || '') + ': ' + new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(context.parsed.y); } } }
+                        tooltip: { 
+                            callbacks: { 
+                                label: function(context) { 
+                                    // ★変更：ツールチップで % と 金額 の両方を表示
+                                    const rawValue = context.dataset.originalData[context.dataIndex];
+                                    const formattedValue = new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(rawValue);
+                                    if (is100Percent) {
+                                        return `${context.dataset.label}: ${context.parsed.y.toFixed(1)}% (${formattedValue})`;
+                                    } else {
+                                        return `${context.dataset.label}: ${formattedValue}`;
+                                    }
+                                } 
+                            } 
+                        }
                     },
                     scales: {
                         x: { stacked: true, grid: { display: false } },
-                        y: { stacked: true, beginAtZero: true, grid: { display: false }, ticks: { display: amountDisplayMode !== 'none', callback: function(value) { return '¥' + value.toLocaleString(); } } }
+                        y: { 
+                            stacked: true, 
+                            beginAtZero: true, 
+                            max: is100Percent ? 100 : undefined, // ★変更：100%ならY軸の最大値を100に固定
+                            grid: { display: false }, 
+                            ticks: { 
+                                display: amountDisplayMode !== 'none', 
+                                callback: function(value) { 
+                                    // ★変更：Y軸の目盛りを % に切り替え
+                                    return is100Percent ? value + '%' : '¥' + value.toLocaleString(); 
+                                } 
+                            } 
+                        }
                     }
                 }
             });
         }
-
         // --- 3つ目のグラフ描画 (データ無しデータセットは凡例非表示) ---
         function drawSalesTypeChart() {
             const labels = Object.keys(salesTypeDataObj).sort();
@@ -2694,7 +2780,7 @@ scales: {
         }
     }
 },
-// ... 後略 ...
+
                     plugins: {
                         legend: { display: true, position: 'top', labels: { boxWidth: 12, padding: 12 } },
                         tooltip: { callbacks: { label: context => context.dataset.label + ': ' + formatRankingMetric(context.parsed.x), footer: items => '合計: ' + formatRankingMetric(items.reduce((sum, item) => sum + (Number(item.parsed.x) || 0), 0)) } }
@@ -2744,8 +2830,9 @@ scales: {
                                 if (row.length >= 2) {
                                     const englishName = String(row[0]).trim(); 
                                     const jpName = String(row[1]).trim();      
+                                    const releaseDate = row.length >= 3 ? String(row[2]).trim() : ""; // ★3列目(インデックス2)からリリース日を取得
                                     const premiumStartDate = row.length >= 4 ? String(row[3]).trim() : ""; 
-                                    if (englishName) premiumMap[englishName] = { jpName: jpName, startDate: premiumStartDate, englishName: englishName };
+                                    if (englishName) premiumMap[englishName] = { jpName: jpName, startDate: premiumStartDate, releaseDate: releaseDate, englishName: englishName }; // ★releaseDateを保存
                                 }
                             }
                         }
@@ -2780,21 +2867,22 @@ scales: {
                     return dateA < dateB ? 1 : (dateA > dateB ? -1 : 0);
                 });
 
-                header.push("日本語名"); header.push("プレミアム開始日"); 
+               header.push("日本語名"); header.push("リリース日"); header.push("プレミアム開始日"); 
                 let matchedCount = 0;
 
                 for (let row of mergedData) {
-                    let jpName = ""; let startDate = "";
+                    let jpName = ""; let startDate = ""; let releaseDate = ""; 
                     let englishTitle = String(row[4] || "").trim(); 
                     let mergeKey = isAlternativeMode ? String(row[3] || "").trim() : englishTitle;
 
                     if (premiumMap[mergeKey]) {
                         jpName = premiumMap[mergeKey].jpName;
                         startDate = premiumMap[mergeKey].startDate;
+                        releaseDate = premiumMap[mergeKey].releaseDate || ""; 
                         if (isAlternativeMode && !premiumMap[mergeKey].englishName) premiumMap[mergeKey].englishName = englishTitle;
                         if (startDate !== "" || jpName !== "") matchedCount++;
                     }
-                    row.push(jpName); row.push(startDate);
+                    row.push(jpName); row.push(releaseDate); row.push(startDate); 
                 }
 
                 const months = Array.from(monthSet).sort();
@@ -2890,8 +2978,8 @@ scales: {
                     }
                 }
 
-                applyRankingPeriodPreset('latest12');
-
+                // applyRankingPeriodPreset('latest12');
+                redrawRankingAnalysis(); // ←この1行を新しく追加
 
                 // --- ダウンロードCSVの作成 ---
                 const mergedCsvString = Papa.unparse([header, ...mergedData]);
@@ -2914,16 +3002,17 @@ scales: {
                 };
 
                 if (isAlternativeMode) {
-                    const generatedPremHeader = ["英語名", "日本語名", "LINEスタンプURL", "プレミアム開始日", "販売開始日"];
+                    
+                    const generatedPremHeader = ["英語名", "日本語名", "リリース日", "プレミアム開始日"];
                     const generatedPremRows = [];
                     for (let key in premiumMap) {
-                        const item = premiumMap[key];
-                        generatedPremRows.push([item.englishName || "", item.jpName || "", "", item.startDate || "", item.releaseDate || ""]);
+                        const item = premiumMap[key];                       
+                        generatedPremRows.push([item.englishName || "", item.jpName || "", item.releaseDate || "", item.startDate || ""]);
                     }
                     const generatedPremCsvString = Papa.unparse([generatedPremHeader, ...generatedPremRows]);
                     const blobPrem = new Blob(["\uFEFF" + generatedPremCsvString], { type: 'text/csv;charset=utf-8;' });
                     
-                    // ★追加・変更：こちらも同様にスマホ対応
+                    // スマホ対応
                     const filePrem = new File([blobPrem], "generated_premium.csv", { type: 'text/csv' });
                     downloadBtnPremium.href = URL.createObjectURL(blobPrem);
                     downloadBtnPremium.download = "generated_premium.csv";
