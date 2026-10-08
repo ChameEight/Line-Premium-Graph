@@ -184,6 +184,7 @@
             background-color: transparent;
             color: var(--secondary-color);
             border: 2px solid var(--secondary-color);
+            margin: 0 auto;
         }
         .btn-outline:hover {
             background-color: #e6f0fa;
@@ -200,6 +201,7 @@
             display: flex;
             gap: 10px;
             justify-content: center;
+            width: 100%;
         }
 
         .status {
@@ -554,7 +556,6 @@
         <div id="chart-area" class="chart-section">
     <h2 id="chart1-title" class="step-title" style="text-align: center;">月別売上金額</h2>
     
-    <!-- ★ここに追加：コントロール類を画像化から除外 -->
     <div class="chart-controls-wrapper" data-html2canvas-ignore="true">
         <div class="chart-controls-row">
             <div class="chart-radio-group">
@@ -585,7 +586,6 @@
     <div class="chart-container">
         <canvas id="revenueChart"></canvas>
     </div>
-    <!-- ★ここもそのまま：ボタン群を画像化から除外 -->
     <div class="action-btn-container" data-html2canvas-ignore="true">
         <div class="export-btn-group">
             <button type="button" class="btn btn-sm btn-outline" onclick="exportChartImage('revenueChart', 'copy')">📋 画像コピー</button>
@@ -638,7 +638,7 @@
 </div>
 
 <div id="chart-area-3" class="chart-section">
-    <h2 class="step-title" style="text-align: center;">月別売上金額 (個別売上 vs プレミアム売上)</h2>    
+    <h2 id="chart3-title" class="step-title" style="text-align: center;">月別売上金額 (個別売上 vs プレミアム売上)</h2>    
    
     <div class="chart-controls-wrapper" data-html2canvas-ignore="true">
         <div class="chart-controls-row">
@@ -655,9 +655,19 @@
                 </select>
             </div>
         </div>
-        <div class="chart-controls-row" style="justify-content: flex-end;">
+        <div class="chart-controls-row" style="justify-content: space-between;">
             <div class="chart-radio-group">
-                <span style="font-size: 0.95rem; color: #555; font-weight: bold; margin-right: 5px;">金額表示:</span>
+                <span style="font-size: 0.95rem; color: #555; font-weight: bold; margin-right: 5px;">売上:</span>
+                <label><input type="radio" name="chart3-sales-type" value="all" checked> 全体</label>
+                <label><input type="radio" name="chart3-sales-type" value="individual"> 個別のみ</label>
+                <label><input type="radio" name="chart3-sales-type" value="premium"> プレミアムのみ</label>
+                <label style="margin-left: 8px;">
+                    <input type="checkbox" id="chart3-count-checkbox">
+                    個数に切り替える
+                </label>
+            </div>
+            <div class="chart-radio-group">
+                <span id="chart3-value-display-label" style="font-size: 0.95rem; color: #555; font-weight: bold; margin-right: 5px;">金額表示:</span>
                 <label><input type="radio" name="chart3-amount-display" value="total" checked> 月の合計のみ</label>
                 <label><input type="radio" name="chart3-amount-display" value="detail"> 内訳ごと</label>      
                 <label><input type="radio" name="chart3-amount-display" value="none"> 表示しない</label>
@@ -729,14 +739,13 @@
             <div class="ranking-grid">
     <div class="ranking-panel">
         <h3 id="title-chart-4">商品売上ランキング (Top 5)</h3>
-        <!-- ★全ランキングを見るチェックボックスを画像化から除外 -->
         <div class="show-all-wrapper" data-html2canvas-ignore="true">
-            <label><input type="checkbox" id="show-all-4"> 全ランキングを見る</label>
+            <div><label><input type="checkbox" id="show-all-4"> 全ランキングを見る</label></div>
+            <div style="margin-top: 6px;"><label><input type="checkbox" id="hide-name-4"> 商品名を非表示</label></div>
         </div>
         <div id="ranking-filter-summary-4" class="ranking-filter-summary" aria-live="polite"></div>
         <div class="chart-container"><canvas id="rankingChart"></canvas></div>
         
-        <!-- ★ボタン群を画像化から除外 -->
         <div class="action-btn-container" data-html2canvas-ignore="true">
             <div class="export-btn-group">
                 <button type="button" class="btn btn-sm btn-outline" onclick="exportChartImage('rankingChart', 'copy')">📋 画像コピー</button>
@@ -750,14 +759,12 @@
 
     <div class="ranking-panel">
         <h3 id="title-chart-5">プレミアム入り月別売上ランキング (Top 5)</h3>
-        <!-- ★全ランキングを見るチェックボックスを画像化から除外 -->
         <div class="show-all-wrapper" data-html2canvas-ignore="true">
             <label><input type="checkbox" id="show-all-5"> 全ランキングを見る</label>
         </div>
         <div id="ranking-filter-summary-5" class="ranking-filter-summary" aria-live="polite"></div>
         <div class="chart-container"><canvas id="premMonthRankingChart"></canvas></div>
         
-        <!-- ★ボタン群を画像化から除外 -->
         <div class="action-btn-container" data-html2canvas-ignore="true">
             <div class="export-btn-group">
                 <button type="button" class="btn btn-sm btn-outline" onclick="exportChartImage('premMonthRankingChart', 'copy')">📋 画像コピー</button>
@@ -771,7 +778,6 @@
 </div>
 
 <div class="ranking-panel ranking-panel-6" style="margin-top: 20px;">
-    <!-- ※プルダウンはそのまま画像に写り込みます -->
     <div class="chart-controls-row ranking6-premium-month-selector" style="margin-bottom: 12px;">
         <div class="period-selector">
             <label for="ranking-premium-month">プレミアム入り月:</label>
@@ -779,14 +785,13 @@
         </div>
     </div>
     <h3 id="title-chart-6">選択したプレミアム入り月の商品売上ランキング (Top 5)</h3>
-    <!-- ★全ランキングを見るチェックボックスを画像化から除外 -->
     <div class="show-all-wrapper" data-html2canvas-ignore="true">
-        <label><input type="checkbox" id="show-all-6"> 全ランキングを見る</label>
+        <div><label><input type="checkbox" id="show-all-6"> 全ランキングを見る</label></div>
+        <div style="margin-top: 6px;"><label><input type="checkbox" id="hide-name-6"> 商品名を非表示</label></div>
     </div>
     <div id="ranking-filter-summary-6" class="ranking-filter-summary" aria-live="polite"></div>
     <div class="chart-container"><canvas id="premMonthProductRankingChart"></canvas></div>
     
-    <!-- ★ボタン群を画像化から除外 -->
     <div class="action-btn-container" data-html2canvas-ignore="true">
         <div class="export-btn-group">
             <button type="button" class="btn btn-sm btn-outline" onclick="exportChartImage('premMonthProductRankingChart', 'copy')">📋 画像コピー</button>
@@ -795,6 +800,59 @@
         <button id="prem-month-product-ranking-csv-download" class="btn" type="button" style="background-color: #6c757d; max-width: 400px; display: none;">
             プレミアム入り月別商品ランキング全順位をCSVでDL
         </button>
+    </div>
+</div>
+</div>
+
+<div id="item-analysis-area" class="chart-section" style="padding-bottom: 30px;">
+    <h2 class="step-title" style="text-align: center;">特定商品 月別推移</h2>
+    
+    <div class="chart-controls-wrapper" data-html2canvas-ignore="true">
+        <div class="chart-controls-row">
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <label for="item-id-input" style="font-weight: bold; color: #555; font-size: 0.95rem;">Item ID:</label>
+                <input type="text" id="item-id-input" placeholder="例: 12345678" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; width: 150px;">
+                <button type="button" id="search-item-btn" class="btn btn-sm" style="margin: 0; min-width: 60px;">表示</button>
+            </div>
+            <div class="chart-radio-group">
+                <span style="font-size: 0.95rem; color: #555; font-weight: bold; margin-right: 5px;">売上:</span>
+                <label><input type="radio" name="item-sales-type" value="all" checked> 全体</label>
+                <label><input type="radio" name="item-sales-type" value="individual"> 個別のみ</label>
+                <label><input type="radio" name="item-sales-type" value="premium"> プレミアムのみ</label>
+                <label style="margin-left: 8px;">
+                    <input type="checkbox" id="item-count-checkbox">
+                    個数に切り替える
+                </label>
+            </div>
+        </div>
+        <!-- 変更点①：左側にあったチェックボックスを消し、右寄せ(flex-end)に変更 -->
+        <div class="chart-controls-row" style="justify-content: flex-end;">
+            <div class="chart-radio-group">
+                <span id="item-value-display-label" style="font-size: 0.95rem; color: #555; font-weight: bold; margin-right: 5px;">金額表示:</span>
+                <label><input type="radio" name="item-amount-display" value="total" checked> 合計のみ</label>
+                <label><input type="radio" name="item-amount-display" value="detail"> 内訳ごと</label>
+                <label><input type="radio" name="item-amount-display" value="none"> 表示しない</label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="ranking-panel" id="item-chart-panel">
+        <h3 id="item-chart-title" style="text-align: center; margin-bottom: 5px; color: #444;">Item ID を入力してください</h3>
+        <!-- 変更点②：タイトル(h3)と絞り込みテキストの間に、チェックボックスを移動 -->
+        <div class="show-all-wrapper" data-html2canvas-ignore="true">
+            <label><input type="checkbox" id="hide-item-name-checkbox"> 商品名を非表示</label>
+        </div>
+        <div id="item-filter-summary" class="chart-filter-summary" aria-live="polite"></div>
+        <div class="chart-container">
+            <canvas id="itemChart"></canvas>
+        </div>
+        
+        <div class="action-btn-container" data-html2canvas-ignore="true">
+            <div class="export-btn-group">
+                <button type="button" class="btn btn-sm btn-outline" onclick="exportChartImage('itemChart', 'copy')">📋 画像コピー</button>
+                <button type="button" class="btn btn-sm btn-outline" onclick="exportChartImage('itemChart', 'download', '商品別月別推移.png')">⬇️ PNG保存</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -814,86 +872,81 @@
         Chart.register(ChartDataLabels);
 
         // === グラフ画像エクスポート処理 ===
-async function exportChartImage(canvasId, action, filename = 'chart.png') {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
+        async function exportChartImage(canvasId, action, filename = 'chart.png') {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
 
-    // ★ chart-section も親要素の検索候補に追加します
-const targetElement = canvas.closest('.ranking-panel') || 
-                      canvas.closest('.chart-section') || // ←これを追加
-                      canvas.closest('.chart-card') || 
-                      canvas.closest('.chart-panel') || 
-                      canvas.parentElement;
+            const targetElement = canvas.closest('.ranking-panel') || 
+                                  canvas.closest('.chart-section') || 
+                                  canvas.closest('.chart-card') || 
+                                  canvas.closest('.chart-panel') || 
+                                  canvas.parentElement;
 
-    // ★変更点：html2canvas を使ってカード全体を画像化する（scale: 2 で高画質化）
-    const capturedCanvas = await html2canvas(targetElement, {
-        scale: 2,
-        backgroundColor: '#ffffff' // 背景色を白で固定
-    });
+            const capturedCanvas = await html2canvas(targetElement, {
+                scale: 2,
+                backgroundColor: '#ffffff'
+            });
 
-    if (action === 'download') {
-        const blob = await new Promise(resolve => capturedCanvas.toBlob(resolve, 'image/png', 1.0));
-        if (!blob) return;
-        const file = new File([blob], filename, { type: 'image/png' });
+            if (action === 'download') {
+                const blob = await new Promise(resolve => capturedCanvas.toBlob(resolve, 'image/png', 1.0));
+                if (!blob) return;
+                const file = new File([blob], filename, { type: 'image/png' });
 
-        // スマホ・タブレットからのアクセスか判定する
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-        // スマホの場合のみ共有メニューを開く
-        if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
-            try {
-                await navigator.share({
-                    files: [file],
-                    title: '売上グラフ'
-                });
-            } catch (err) {
-                console.log('共有がキャンセルされました:', err);
+                if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: '売上グラフ'
+                        });
+                    } catch (err) {
+                        console.log('共有がキャンセルされました:', err);
+                    }
+                } else {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.download = filename;
+                    link.href = url;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    URL.revokeObjectURL(url);
+                }
+            } else if (action === 'copy') {
+                try {
+                    const blob = await new Promise(resolve => capturedCanvas.toBlob(resolve, 'image/png', 1.0));
+                    if (!blob) throw new Error('Blob creation failed');
+                    const item = new ClipboardItem({ 'image/png': blob });
+                    await navigator.clipboard.write([item]);
+                    
+                    const message = document.createElement('div');
+                    message.textContent = '✓ クリップボードに画像をコピーしました！（メモ帳やSNS等に貼り付け可能です）';
+                    message.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        background: rgba(0, 0, 0, 0.8);
+                        color: white;
+                        padding: 12px 20px;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        z-index: 9999;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                    `;
+
+                    document.body.appendChild(message);
+
+                    setTimeout(() => {
+                        message.remove();
+                    }, 2000);
+                } catch (err) {
+                    console.error('Clipboard copy failed:', err);
+                    alert('お使いのブラウザまたは環境（http等）ではクリップボードへの画像コピーが許可されていません。\n「PNG保存」をご利用ください。');
+                }
             }
-        } else {
-            // PC等の場合：ワンクリックで直接ダウンロード
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.download = filename;
-            link.href = url;
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            URL.revokeObjectURL(url);
         }
-    } else if (action === 'copy') {
-        try {
-            const blob = await new Promise(resolve => capturedCanvas.toBlob(resolve, 'image/png', 1.0));
-            if (!blob) throw new Error('Blob creation failed');
-            const item = new ClipboardItem({ 'image/png': blob });
-            await navigator.clipboard.write([item]);
-            
-            const message = document.createElement('div');
-            message.textContent = '✓ クリップボードに画像をコピーしました！（メモ帳やSNS等に貼り付け可能です）';
-            message.style.cssText = `
-                position: fixed;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(0, 0, 0, 0.8);
-                color: white;
-                padding: 12px 20px;
-                border-radius: 8px;
-                font-size: 14px;
-                z-index: 9999;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            `;
-
-            document.body.appendChild(message);
-
-            setTimeout(() => {
-                message.remove();
-            }, 2000);
-        } catch (err) {
-            console.error('Clipboard copy failed:', err);
-            alert('お使いのブラウザまたは環境（http等）ではクリップボードへの画像コピーが許可されていません。\n「PNG保存」をご利用ください。');
-        }
-    }
-}
 
         // === サマリー画像エクスポート処理 ===
         async function exportSummaryImage(action, filename = '売上サマリー.png') {
@@ -917,11 +970,8 @@ const targetElement = canvas.closest('.ranking-panel') ||
                     const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 1.0));
                     if (!blob) return;
                     const file = new File([blob], filename, { type: 'image/png' });
-
-                    // ★追加：スマホ・タブレットからのアクセスか判定する
                     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-                    // ★変更：スマホの場合のみ共有メニューを開く
                     if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
                         try {
                             await navigator.share({
@@ -932,7 +982,6 @@ const targetElement = canvas.closest('.ranking-panel') ||
                             console.log('共有がキャンセルされました:', err);
                         }
                     } else {
-                        // PC等の場合：ワンクリックで直接ダウンロード
                         const url = URL.createObjectURL(blob);
                         const link = document.createElement('a');
                         link.download = filename;
@@ -952,52 +1001,155 @@ const targetElement = canvas.closest('.ranking-panel') ||
                     if (!blob) throw new Error('Blob creation failed');
                     await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
                     const message = document.createElement('div');
-message.textContent = '✓ クリップボードに画像をコピーしました！（メモ帳やSNS等に貼り付け可能です）';
-message.style.cssText = `
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    z-index: 9999;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-`;
+                    message.textContent = '✓ クリップボードに画像をコピーしました！（メモ帳やSNS等に貼り付け可能です）';
+                    message.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        background: rgba(0, 0, 0, 0.8);
+                        color: white;
+                        padding: 12px 20px;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        z-index: 9999;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                    `;
 
-document.body.appendChild(message);
-
-setTimeout(() => {
-    message.remove();
-}, 2000);
+                    document.body.appendChild(message);
+                    setTimeout(() => { message.remove(); }, 2000);
                 }
             } catch (err) {
                 console.error('Summary image export failed:', err);
                 const message = document.createElement('div');
-message.textContent = '✓ クリップボードに画像をコピーしました！（メモ帳やSNS等に貼り付け可能です）';
-message.style.cssText = `
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    z-index: 9999;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-`;
-
-document.body.appendChild(message);
-
-setTimeout(() => {
-    message.remove();
-}, 2000);
+                message.textContent = '✓ コピーに失敗しました';
+                document.body.appendChild(message);
+                setTimeout(() => { message.remove(); }, 2000);
             }
         }
+
+        // グラフクリック時の共通処理
+        function handleRankingChartClick(e, elements, chart, displayItems) {
+            let index = -1;
+            if (elements.length > 0) {
+                index = elements[0].index;
+            } else if (chart.chartArea) {
+                if (e.x <= chart.chartArea.left && e.y >= chart.chartArea.top && e.y <= chart.chartArea.bottom) {
+                    const yAxis = chart.scales.y;
+                    let minDiff = Infinity;
+                    for (let i = 0; i < displayItems.length; i++) {
+                        const tickY = yAxis.getPixelForValue(i);
+                        const diff = Math.abs(tickY - e.y);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            index = i;
+                        }
+                    }
+                    if (index !== -1) {
+                        const rowHeight = (chart.chartArea.bottom - chart.chartArea.top) / displayItems.length;
+                        if (minDiff > rowHeight / 1.5) {
+                            index = -1;
+                        }
+                    }
+                }
+            }
+
+            if (index >= 0 && index < displayItems.length) {
+                const itemName = displayItems[index].name;
+                const itemId = nameItemIdMap[itemName]; 
+                
+                if (itemId) {
+                    document.getElementById('item-id-input').value = itemId;
+                    drawItemChart();
+                    
+                    const targetEl = document.getElementById('item-analysis-area');
+                    if (targetEl) {
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        const panel = document.getElementById('item-chart-panel');
+                        if (panel) {
+                            panel.style.transition = 'background-color 0.8s ease';
+                            panel.style.backgroundColor = '#fffae6'; 
+                            setTimeout(() => {
+                                panel.style.backgroundColor = '#fff';
+                            }, 1200);
+                        }
+                    }
+                } else {
+                    console.warn('Item IDが見つかりませんでした:', itemName);
+                }
+            }
+        }
+
+        // マウスオーバー時にカーソルを指マークにする処理
+        function handleRankingChartHover(e, elements, chart) {
+            let isYAxisLabel = false;
+            if (e.x !== undefined && e.y !== undefined && chart.chartArea) {
+                isYAxisLabel = (e.x <= chart.chartArea.left && e.y >= chart.chartArea.top && e.y <= chart.chartArea.bottom);
+            }
+            if (elements.length > 0 || isYAxisLabel) {
+                e.native.target.style.cursor = 'pointer';
+            } else {
+                e.native.target.style.cursor = 'default';
+            }
+		
+        }
+	// 5つ目のグラフをクリックした時の処理
+        function handlePremMonthRankingChartClick(e, elements, chart, displayItems) {
+            let index = -1;
+            // 棒グラフの部分や、左側の文字(ラベル)がクリックされたか判定
+            if (elements.length > 0) {
+                index = elements[0].index;
+            } else if (chart.chartArea) {
+                if (e.x <= chart.chartArea.left && e.y >= chart.chartArea.top && e.y <= chart.chartArea.bottom) {
+                    const yAxis = chart.scales.y;
+                    let minDiff = Infinity;
+                    for (let i = 0; i < displayItems.length; i++) {
+                        const tickY = yAxis.getPixelForValue(i);
+                        const diff = Math.abs(tickY - e.y);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            index = i;
+                        }
+                    }
+                    if (index !== -1) {
+                        const rowHeight = (chart.chartArea.bottom - chart.chartArea.top) / displayItems.length;
+                        if (minDiff > rowHeight / 1.5) {
+                            index = -1;
+                        }
+                    }
+                }
+            }
+
+            // クリックされた月が特定できた場合の動作
+            if (index >= 0 && index < displayItems.length) {
+                const clickedMonth = displayItems[index].name; // 例: "2024/01" などのデータ
+                
+                const premiumMonthSelect = document.getElementById('ranking-premium-month');
+                if (premiumMonthSelect) {
+                    // 1. 6つ目のグラフのプルダウンを選択した月に変更
+                    premiumMonthSelect.value = clickedMonth;
+                    
+                    // 2. 6つ目のグラフを最新の状態で再描画
+                    drawPremMonthProductRankingChart();
+                    
+                    // 3. 6つ目のグラフの場所まで画面をスクロールして、背景を少し光らせる（分かりやすくするため）
+                    const targetEl = document.querySelector('.ranking-panel-6');
+                    if (targetEl) {
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        targetEl.style.transition = 'background-color 0.8s ease';
+                        targetEl.style.backgroundColor = '#fffae6'; 
+                        setTimeout(() => {
+                            targetEl.style.backgroundColor = '#fff';
+                        }, 1200);
+                    }
+                }
+            }
+        }
+       
+
+        let itemReleaseMonthMap = {};
+        let itemReleaseDateMap = {};
+	let itemPremiumDateMap = {};
 
         let salesFiles = [];    
         let premiumFile = null; 
@@ -1014,7 +1166,10 @@ setTimeout(() => {
         let salesTypeChartInstance = null;
         let salesTypeDataObj = {}; 
         let salesTypeDataByPremDate = {}; 
+        let salesTypeCountDataObj = {}; 
+        let salesTypeCountDataByPremDate = {}; 
         let availableChart3PremDates = new Set(); 
+        let premDateReleaseMonthMap = {}; 
 
         let rankingChartInstance = null;
         let rankingDataObj = {};
@@ -1032,6 +1187,12 @@ setTimeout(() => {
         let premMonthProductRankingChartInstance = null;
         let currentPremMonthProductRankingExport = null;
 
+        let itemChartInstance = null;
+        let itemDataObj = {};
+        let itemCountDataObj = {};
+        let itemIdNameMap = {};
+        let nameItemIdMap = {}; 
+
         const executeBtn = document.getElementById('execute-btn');
         const statusEl = document.getElementById('status');
         const downloadArea = document.getElementById('download-area');
@@ -1041,6 +1202,7 @@ setTimeout(() => {
         const chartArea3 = document.getElementById('chart-area-3');
         const chartArea4 = document.getElementById('ranking-analysis-area');
         const chartArea5 = chartArea4;
+        const chartArea7 = document.getElementById('item-analysis-area');
         const summaryArea = document.getElementById('summary-area');
         
         const chartTypeRadios = document.querySelectorAll('input[name="chart-type"]');
@@ -1058,6 +1220,8 @@ setTimeout(() => {
         const chart3TypeRadios = document.querySelectorAll('input[name="chart3-type"]');
         const chart3AmountDisplayRadios = document.querySelectorAll('input[name="chart3-amount-display"]');
         const chart3PremiumStartFilter = document.getElementById('chart3-premium-start-filter');
+        const chart3SalesTypeRadios = document.querySelectorAll('input[name="chart3-sales-type"]'); 
+        const chart3CountCheckbox = document.getElementById('chart3-count-checkbox'); 
 
         const rankingItemTypeRadios = document.querySelectorAll('input[name="ranking-item-type"]');
         const rankingSalesTypeRadios = document.querySelectorAll('input[name="ranking-sales-type"]');
@@ -1068,6 +1232,8 @@ setTimeout(() => {
         const showAll4 = document.getElementById('show-all-4');
         const showAll5 = document.getElementById('show-all-5');
         const showAll6 = document.getElementById('show-all-6');
+        const hideName4 = document.getElementById('hide-name-4');
+        const hideName6 = document.getElementById('hide-name-6');
 
         const rankingStartMonthSelect = document.getElementById('ranking-start-month');
         const rankingEndMonthSelect = document.getElementById('ranking-end-month');
@@ -1076,6 +1242,13 @@ setTimeout(() => {
         const rankingCsvDownload = document.getElementById('ranking-csv-download');
         const premRankingCsvDownload = document.getElementById('prem-ranking-csv-download');
         const premMonthProductRankingCsvDownload = document.getElementById('prem-month-product-ranking-csv-download');
+
+        const itemSalesTypeRadios = document.querySelectorAll('input[name="item-sales-type"]');
+        const itemAmountDisplayRadios = document.querySelectorAll('input[name="item-amount-display"]');
+        const itemCountCheckbox = document.getElementById('item-count-checkbox');
+        const itemIdInput = document.getElementById('item-id-input');
+        const searchItemBtn = document.getElementById('search-item-btn');
+        const hideItemNameCheckbox = document.getElementById('hide-item-name-checkbox');
 
         const summaryTotal = document.getElementById('summary-total');
         const summarySticker = document.getElementById('summary-sticker');
@@ -1096,7 +1269,6 @@ setTimeout(() => {
         const premiumFileInput = document.getElementById('premium-file-input');
         const premiumFileList = document.getElementById('premium-file-list');
 
-        // --- 1つ目のグラフのUI制御（内訳ごとラジオのグレーアウトおよび連動切り替え） ---
         function updateChart1ControlsUI() {
             const viewType = document.querySelector('input[name="chart-type"]:checked').value;
             updateChart1FilterSummary();
@@ -1110,7 +1282,6 @@ setTimeout(() => {
                 if (label) {
                     label.classList.toggle('disabled-label', !isDetailAvailable);
                 }
-                // もしも先に「内訳ごと」にチェックが入っていれば「月の合計のみ」に切り替える
                 if (!isDetailAvailable && detailRadio.checked) {
                     const totalRadio = document.querySelector('input[name="chart1-amount-display"][value="total"]');
                     if (totalRadio) totalRadio.checked = true;
@@ -1118,7 +1289,6 @@ setTimeout(() => {
             }
         }
 
-        // --- 1つ目のグラフのイベントリスナー ---
         chartTypeRadios.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 const viewType = e.target.value;
@@ -1149,12 +1319,10 @@ setTimeout(() => {
             if (Object.keys(globalMonthlyData).length > 0) drawChart();
         });
 
-        // --- 2つ目のグラフのイベントリスナー ---
         startMonthSelect.addEventListener('change', (e) => {
             updatePremiumChartUI(e.target.value);
         });
 
-        // 100%積み上げ式チェックボックスの切り替えイベント
         document.getElementById('chart2-100percent-checkbox').addEventListener('change', () => {
             if (Object.keys(premiumDataObj).length > 0) updatePremiumChartUI(startMonthSelect.value);
         });
@@ -1171,11 +1339,50 @@ setTimeout(() => {
             });
         });
 
-        // --- 3つ目のグラフのイベントリスナー ---
+        function updateChart3AmountDisplayUI() {
+            const salesType = document.querySelector('input[name="chart3-sales-type"]:checked')?.value;
+            const detailRadio = document.querySelector('input[name="chart3-amount-display"][value="detail"]');
+            const totalRadio = document.querySelector('input[name="chart3-amount-display"][value="total"]');
+            if (!detailRadio) return;
+            const isDetailAvailable = salesType === 'all';
+            detailRadio.disabled = !isDetailAvailable;
+            const detailLabel = detailRadio.closest('label');
+            if (detailLabel) detailLabel.classList.toggle('disabled-label', !isDetailAvailable);
+            
+            if (!isDetailAvailable && detailRadio.checked && totalRadio) totalRadio.checked = true;
+        }
+
+        function updateChart3SalesTypeUI() {
+            const isCountMode = chart3CountCheckbox.checked;
+            chart3SalesTypeRadios.forEach(radio => {
+                const label = radio.closest('label');
+                const isPremiumOption = radio.value === 'premium';
+                const isAllOption = radio.value === 'all';
+                const shouldDisable = isCountMode && (isPremiumOption || isAllOption);
+                radio.disabled = shouldDisable;
+                if (label) label.classList.toggle('disabled-label', shouldDisable);
+            });
+            if (isCountMode) {
+                const individualRadio = document.querySelector('input[name="chart3-sales-type"][value="individual"]');
+                if (individualRadio) individualRadio.checked = true;
+            }
+            updateChart3AmountDisplayUI();
+        }
+
         chart3TypeRadios.forEach(radio => {
             radio.addEventListener('change', () => {
                 if (Object.keys(salesTypeDataObj).length > 0) drawSalesTypeChart();
             });
+        });
+
+        chart3SalesTypeRadios.forEach(r => r.addEventListener('change', () => {
+            updateChart3AmountDisplayUI();
+            if (Object.keys(salesTypeDataObj).length > 0) drawSalesTypeChart();
+        }));
+
+        chart3CountCheckbox.addEventListener('change', () => {
+            updateChart3SalesTypeUI();
+            if (Object.keys(salesTypeDataObj).length > 0) drawSalesTypeChart();
         });
 
         chart3AmountDisplayRadios.forEach(radio => {
@@ -1188,7 +1395,49 @@ setTimeout(() => {
             if (Object.keys(salesTypeDataObj).length > 0) drawSalesTypeChart();
         });
 
-        // --- ランキング分析のイベントリスナー ---
+        function updateItemAmountDisplayUI() {
+            const salesType = document.querySelector('input[name="item-sales-type"]:checked')?.value;
+            const detailRadio = document.querySelector('input[name="item-amount-display"][value="detail"]');
+            const totalRadio = document.querySelector('input[name="item-amount-display"][value="total"]');
+            if (!detailRadio) return;
+            const isDetailAvailable = salesType === 'all';
+            detailRadio.disabled = !isDetailAvailable;
+            const detailLabel = detailRadio.closest('label');
+            if (detailLabel) detailLabel.classList.toggle('disabled-label', !isDetailAvailable);
+            
+            if (!isDetailAvailable && detailRadio.checked && totalRadio) totalRadio.checked = true;
+        }
+
+        function updateItemSalesTypeUI() {
+            const isCountMode = itemCountCheckbox.checked;
+            itemSalesTypeRadios.forEach(radio => {
+                const label = radio.closest('label');
+                const isPremiumOption = radio.value === 'premium';
+                const isAllOption = radio.value === 'all';
+                const shouldDisable = isCountMode && (isPremiumOption || isAllOption);
+                radio.disabled = shouldDisable;
+                if (label) label.classList.toggle('disabled-label', shouldDisable);
+            });
+            if (isCountMode) {
+                const individualRadio = document.querySelector('input[name="item-sales-type"][value="individual"]');
+                if (individualRadio) individualRadio.checked = true;
+            }
+            updateItemAmountDisplayUI();
+        }
+
+        itemSalesTypeRadios.forEach(r => r.addEventListener('change', () => {
+            updateItemAmountDisplayUI();
+            drawItemChart();
+        }));
+        itemAmountDisplayRadios.forEach(r => r.addEventListener('change', drawItemChart));
+        itemCountCheckbox.addEventListener('change', () => {
+            updateItemSalesTypeUI();
+            drawItemChart();
+        });
+        searchItemBtn.addEventListener('click', drawItemChart);
+        itemIdInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') drawItemChart(); });
+        hideItemNameCheckbox.addEventListener('change', drawItemChart);
+
         function redrawRankingAnalysis() {
             if (Object.keys(rankingDataObj).length > 0) drawRankingChart();
             if (Object.keys(premMonthRankingDataObj).length > 0) drawPremMonthRankingChart();
@@ -1232,7 +1481,6 @@ setTimeout(() => {
         rankingAmountDisplayRadios.forEach(radio => radio.addEventListener('change', redrawRankingAnalysis));
         rankingPeriodPresetRadios.forEach(radio => radio.addEventListener('change', (e) => applyRankingPeriodPreset(e.target.value)));
 
-        // 「売上」が全体以外の場合、「内訳ごと」は選択不可にする
         function updateRankingAmountDisplayUI() {
             const salesType = document.querySelector('input[name="ranking-sales-type"]:checked')?.value;
             const detailRadio = document.querySelector('input[name="ranking-amount-display"][value="detail"]');
@@ -1247,8 +1495,6 @@ setTimeout(() => {
                 detailLabel.classList.toggle('disabled-label', !isDetailAvailable);
             }
 
-            // 「内訳ごと」が選択されていた状態で「全体」以外へ切り替えた場合は
-            // 自動的に「合計のみ」へ戻す
             if (!isDetailAvailable && detailRadio.checked && totalRadio) {
                 totalRadio.checked = true;
             }
@@ -1289,6 +1535,8 @@ setTimeout(() => {
         showAll4.addEventListener('change', () => { if (Object.keys(rankingDataObj).length > 0) drawRankingChart(); });
         showAll5.addEventListener('change', () => { if (Object.keys(premMonthRankingDataObj).length > 0) drawPremMonthRankingChart(); });
         showAll6.addEventListener('change', () => { if (Object.keys(rankingDataObj).length > 0 && rankingPremiumMonthSelect.value) drawPremMonthProductRankingChart(); });
+        hideName4.addEventListener('change', () => { if (Object.keys(rankingDataObj).length > 0) drawRankingChart(); });
+        hideName6.addEventListener('change', () => { if (Object.keys(rankingDataObj).length > 0 && rankingPremiumMonthSelect.value) drawPremMonthProductRankingChart(); });
 
         rankingStartMonthSelect.addEventListener('change', handleRankingPeriodChange);
         rankingEndMonthSelect.addEventListener('change', handleRankingPeriodChange);
@@ -1360,6 +1608,7 @@ setTimeout(() => {
             chartArea2.style.display = 'none';
             chartArea3.style.display = 'none';
             chartArea4.style.display = 'none';
+            chartArea7.style.display = 'none';
             statusEl.className = 'status';
             statusEl.style.display = 'none';
         }
@@ -1417,6 +1666,23 @@ setTimeout(() => {
             const month = parseInt(match[2], 10);
             if (month < 1 || month > 12) return "";
             return `${match[1]}/${String(month).padStart(2, '0')}`;
+        }
+
+        function getMonthsBetween(startMonthKey, endMonthKey) {
+            const months = [];
+            if (!startMonthKey || !endMonthKey) return months;
+            let [currY, currM] = startMonthKey.split('/').map(Number);
+            const [endY, endM] = endMonthKey.split('/').map(Number);
+            
+            while (currY < endY || (currY === endY && currM <= endM)) {
+                months.push(`${currY}/${String(currM).padStart(2, '0')}`);
+                currM++;
+                if (currM > 12) {
+                    currM = 1;
+                    currY++;
+                }
+            }
+            return months;
         }
 
         function aggregateData(mergedData, header) {
@@ -1531,6 +1797,8 @@ setTimeout(() => {
         function aggregateSalesTypeData(mergedData, header) {
             let dateIdx = 0, revIdx = 12, typeIdx = 2, countryIdx = 5;
             let premDateIdx = header.indexOf("プレミアム開始日");
+            let releaseDateIdx = header.indexOf("リリース日"); 
+            let countIdx = -1; 
 
             for (let i = 0; i < header.length; i++) {
                 const colName = String(header[i]).trim();
@@ -1538,11 +1806,16 @@ setTimeout(() => {
                 if (colName.includes("Revenue Share") || colName.includes("分配額") || colName.includes("売上")) revIdx = i;
                 if (colName.includes("Type") || colName.includes("アイテム") || colName.includes("タイプ")) typeIdx = i;
                 if (colName === "Country of Sale" || colName === "販売国") countryIdx = i; 
+                if (colName === "Sales Counts" || colName.includes("販売個数") || colName.includes("売上個数")) countIdx = i; 
             }
 
             salesTypeDataObj = {};
             salesTypeDataByPremDate = {};
+            salesTypeCountDataObj = {}; 
+            salesTypeCountDataByPremDate = {}; 
             availableChart3PremDates = new Set();
+            premDateReleaseMonthMap = {}; 
+            let overallOldestReleaseMonth = null; 
 
             for (let row of mergedData) {
                 const dateStr = String(row[dateIdx] || "").trim();
@@ -1553,6 +1826,8 @@ setTimeout(() => {
                 if (monthKey) {
                     const rawRev = String(row[revIdx] || "0").replace(/,/g, '').trim();
                     const revNum = parseFloat(rawRev);
+                    let countNum = countIdx === -1 ? 0 : parseFloat(String(row[countIdx] ?? "0").replace(/,/g, '').trim()); 
+                    if (isNaN(countNum)) countNum = 0; 
                     
                     let itemType = 'sticker';
                     if (typeStr === 'Emoji' || typeStr === '絵文字') itemType = 'emoji';
@@ -1566,28 +1841,67 @@ setTimeout(() => {
 
                     availableChart3PremDates.add(premDateStr);
 
-                    if (!isNaN(revNum)) {
+                    let releaseDateStr = releaseDateIdx !== -1 ? String(row[releaseDateIdx] || "").trim() : "";
+                    let releaseMonth = extractMonthKey(releaseDateStr);
+                    if (releaseMonth) {
+                        if (!premDateReleaseMonthMap[premDateStr] || releaseMonth < premDateReleaseMonthMap[premDateStr]) {
+                            premDateReleaseMonthMap[premDateStr] = releaseMonth;
+                        }
+                        if (!overallOldestReleaseMonth || releaseMonth < overallOldestReleaseMonth) {
+                            overallOldestReleaseMonth = releaseMonth;
+                        }
+                    }
+
+                    if (!isNaN(revNum) || countNum !== 0) { 
                         if (!salesTypeDataObj[monthKey]) {
                             salesTypeDataObj[monthKey] = {
                                 individual: { total: 0, sticker: 0, emoji: 0, theme: 0 },
                                 premium: { total: 0, sticker: 0, emoji: 0, theme: 0 }
                             };
                         }
-                        salesTypeDataObj[monthKey][salesType].total += revNum;
-                        salesTypeDataObj[monthKey][salesType][itemType] += revNum;
+                        if (!salesTypeCountDataObj[monthKey]) { 
+                            salesTypeCountDataObj[monthKey] = {
+                                individual: { total: 0, sticker: 0, emoji: 0, theme: 0 },
+                                premium: { total: 0, sticker: 0, emoji: 0, theme: 0 }
+                            };
+                        }
 
-                        if (!salesTypeDataByPremDate[premDateStr]) salesTypeDataByPremDate[premDateStr] = {};
+                        if (!isNaN(revNum)) {
+                            salesTypeDataObj[monthKey][salesType].total += revNum;
+                            salesTypeDataObj[monthKey][salesType][itemType] += revNum;
+                        }
+                        
+                        salesTypeCountDataObj[monthKey][salesType].total += countNum;
+                        salesTypeCountDataObj[monthKey][salesType][itemType] += countNum;
+
+                        if (!salesTypeDataByPremDate[premDateStr]) {
+                            salesTypeDataByPremDate[premDateStr] = {};
+                            salesTypeCountDataByPremDate[premDateStr] = {}; 
+                        }
                         if (!salesTypeDataByPremDate[premDateStr][monthKey]) {
                             salesTypeDataByPremDate[premDateStr][monthKey] = {
                                 individual: { total: 0, sticker: 0, emoji: 0, theme: 0 },
                                 premium: { total: 0, sticker: 0, emoji: 0, theme: 0 }
                             };
                         }
-                        salesTypeDataByPremDate[premDateStr][monthKey][salesType].total += revNum;
-                        salesTypeDataByPremDate[premDateStr][monthKey][salesType][itemType] += revNum;
+                        if (!salesTypeCountDataByPremDate[premDateStr][monthKey]) { 
+                            salesTypeCountDataByPremDate[premDateStr][monthKey] = {
+                                individual: { total: 0, sticker: 0, emoji: 0, theme: 0 },
+                                premium: { total: 0, sticker: 0, emoji: 0, theme: 0 }
+                            };
+                        }
+
+                        if (!isNaN(revNum)) {
+                            salesTypeDataByPremDate[premDateStr][monthKey][salesType].total += revNum;
+                            salesTypeDataByPremDate[premDateStr][monthKey][salesType][itemType] += revNum;
+                        }
+                        
+                        salesTypeCountDataByPremDate[premDateStr][monthKey][salesType].total += countNum;
+                        salesTypeCountDataByPremDate[premDateStr][monthKey][salesType][itemType] += countNum;
                     }
                 }
             }
+            premDateReleaseMonthMap['all'] = overallOldestReleaseMonth;
         }
 
         function aggregateRankingData(mergedData, header) {
@@ -1681,6 +1995,205 @@ setTimeout(() => {
             }
         }
 
+        function aggregateItemData(mergedData, header) {
+            let dateIdx = 0, revIdx = 12, countIdx = -1, countryIdx = 5, itemIdIdx = -1, jpNameIdx = -1;
+            
+            for (let i = 0; i < header.length; i++) {
+                const colName = String(header[i]).trim();
+                if (colName.includes("From") || colName.includes("売上月") || colName.includes("Date")) dateIdx = i;
+                if (colName.includes("Revenue Share") || colName.includes("分配額") || colName.includes("売上")) revIdx = i;
+                if (colName === "Sales Counts" || colName.includes("販売個数") || colName.includes("売上個数")) countIdx = i;
+                if (colName === "Country of Sale" || colName === "販売国") countryIdx = i;
+                if (colName === "Item ID" || colName === "アイテムID") itemIdIdx = i;
+            }
+            
+            jpNameIdx = header.indexOf("日本語名");
+            let releaseDateIdx = header.indexOf("リリース日"); 
+	    let premDateIdx = header.indexOf("プレミアム開始日");
+            if (itemIdIdx === -1) itemIdIdx = 3; 
+            if (jpNameIdx === -1) jpNameIdx = 14; 
+
+            itemDataObj = {};
+            itemCountDataObj = {};
+            itemIdNameMap = {};
+            nameItemIdMap = {}; 
+            itemReleaseMonthMap = {}; 
+            itemReleaseDateMap = {};
+	    itemPremiumDateMap = {};
+	
+            for (let row of mergedData) {
+                const monthKey = extractMonthKey(String(row[dateIdx] || "").trim());
+                if (!monthKey) continue;
+                const itemId = String(row[itemIdIdx] || "").trim();
+                if (!itemId) continue;
+
+                let releaseDateStr = releaseDateIdx !== -1 ? String(row[releaseDateIdx] || "").trim() : "";
+                let releaseMonth = extractMonthKey(releaseDateStr);
+		if (releaseDateStr && !itemReleaseDateMap[itemId]) {
+                    itemReleaseDateMap[itemId] = releaseDateStr;
+                }
+                if (releaseMonth) {
+                    if (!itemReleaseMonthMap[itemId]) {
+                        itemReleaseMonthMap[itemId] = releaseMonth;
+                    } else if (releaseMonth < itemReleaseMonthMap[itemId]) {
+                        itemReleaseMonthMap[itemId] = releaseMonth;
+                    }
+                }
+		let premDateStr = premDateIdx !== -1 ? String(row[premDateIdx] || "").trim() : "";
+                if (premDateStr && premDateStr !== "未設定" && !itemPremiumDateMap[itemId]) {
+                    itemPremiumDateMap[itemId] = premDateStr;
+                }
+		// データからプレミアム開始日を読み取って保存する
+                const countryStr = String(row[countryIdx] || "").trim();
+                const revNum = parseFloat(String(row[revIdx] || "0").replace(/,/g, '').trim());
+                let countNum = countIdx === -1 ? 0 : parseFloat(String(row[countIdx] ?? "0").replace(/,/g, '').trim());
+                
+                if (isNaN(countNum)) countNum = 0;
+                if (isNaN(revNum) && countNum === 0) continue;
+
+                const salesType = (countryStr === 'Premium' || countryStr === 'Premium ') ? 'premium' : 'individual';
+                let jpName = String(row[jpNameIdx] || "").trim();
+                if (!jpName) jpName = String(row[4] || "名称不明").trim();
+
+                if (!itemIdNameMap[itemId]) itemIdNameMap[itemId] = jpName;
+                if (!nameItemIdMap[jpName]) nameItemIdMap[jpName] = itemId; 
+
+                if (!itemDataObj[itemId]) itemDataObj[itemId] = {};
+                if (!itemDataObj[itemId][monthKey]) itemDataObj[itemId][monthKey] = { individual: 0, premium: 0 };
+                itemDataObj[itemId][monthKey][salesType] += isNaN(revNum) ? 0 : revNum;
+
+                if (!itemCountDataObj[itemId]) itemCountDataObj[itemId] = {};
+                if (!itemCountDataObj[itemId][monthKey]) itemCountDataObj[itemId][monthKey] = { individual: 0, premium: 0 };
+                itemCountDataObj[itemId][monthKey][salesType] += countNum;
+            }
+        }
+
+        function drawItemChart() {
+            const itemId = document.getElementById('item-id-input').value.trim();
+            const titleEl = document.getElementById('item-chart-title');
+            const chartArea7 = document.getElementById('item-analysis-area');
+            const hideItemName = document.getElementById('hide-item-name-checkbox').checked;
+            
+            if (!itemId || !itemDataObj[itemId]) {
+                titleEl.style.display = 'block';
+                titleEl.textContent = itemId ? "該当するデータが見つかりません" : "Item ID を入力してください";
+                titleEl.style.color = itemId ? '#d9534f' : '#444';
+                if (itemChartInstance) { itemChartInstance.destroy(); itemChartInstance = null; }
+                return;
+            }
+            
+            titleEl.style.color = '#444';
+            const jpName = itemIdNameMap[itemId] || "名称不明";
+            
+            if (hideItemName) {
+                titleEl.style.display = 'none';
+            } else {
+                titleEl.style.display = 'block';
+                titleEl.textContent = jpName;
+            }
+            
+            const isCountMode = document.getElementById('item-count-checkbox').checked;
+            const salesType = document.querySelector('input[name="item-sales-type"]:checked').value;
+            const amountDisplay = document.querySelector('input[name="item-amount-display"]:checked').value;
+            
+            document.getElementById('item-value-display-label').textContent = isCountMode ? '個数表示:' : '金額表示:';
+            
+            const sourceData = isCountMode ? itemCountDataObj[itemId] : itemDataObj[itemId];
+            const dataMonths = Object.keys(sourceData).sort();
+            
+            let startMonth = itemReleaseMonthMap[itemId] || dataMonths[0];
+            if (dataMonths[0] < startMonth) {
+                startMonth = dataMonths[0];
+            }
+
+            let endMonth = availableMonths && availableMonths.length > 0 ? availableMonths[availableMonths.length - 1] : dataMonths[dataMonths.length - 1];
+            if (dataMonths[dataMonths.length - 1] > endMonth) {
+                endMonth = dataMonths[dataMonths.length - 1];
+            }
+
+            const months = getMonthsBetween(startMonth, endMonth);
+            
+            const individualColor = { bg: '#4a90e2', border: '#ffffff' }; 
+            const premiumColor = { bg: '#dee34b', border: '#ffffff' }; 
+            
+            const formatMetric = (value) => {
+                return isCountMode ? Math.round(value || 0).toLocaleString('ja-JP') + '個' : '¥' + Math.round(value || 0).toLocaleString('ja-JP');
+            };
+
+            const datasets = [];
+            const indData = months.map(m => sourceData[m] ? (sourceData[m].individual || 0) : 0);
+            const premData = months.map(m => sourceData[m] ? (sourceData[m].premium || 0) : 0);
+            
+            const detailDatalabelsConfig = {
+                display: amountDisplay === 'detail', color: '#fff', font: { weight: 'bold', size: 10 },
+                formatter: (value) => value > 0 ? formatMetric(value) : '', anchor: 'center', align: 'center',
+                textShadowBlur: 3, textShadowColor: 'rgba(0,0,0,0.5)'
+            };
+            
+            const dynamicTotalDatalabelsConfigItem = {
+                display: function(context) {
+                    const chart = context.chart;
+                    let lastVisible = -1;
+                    for (let i = chart.data.datasets.length - 1; i >= 0; i--) {
+                        if (chart.isDatasetVisible(i)) { lastVisible = i; break; }
+                    }
+                    return context.datasetIndex === lastVisible;
+                },
+                formatter: function(value, context) {
+                    const chart = context.chart;
+                    let sum = 0;
+                    for (let i = 0; i < chart.data.datasets.length; i++) {
+                        if (chart.isDatasetVisible(i)) sum += Number(chart.data.datasets[i].data[context.dataIndex]) || 0;
+                    }
+                    return sum > 0 ? formatMetric(sum) : '';
+                },
+                anchor: 'end', align: 'top', color: '#333', font: { weight: 'bold', size: 12 }, textShadowBlur: 0
+            };
+            
+            let labelConfig = amountDisplay === 'detail' ? detailDatalabelsConfig : (amountDisplay === 'total' ? dynamicTotalDatalabelsConfigItem : { display: false });
+            
+            if (salesType === 'all' || salesType === 'individual') {
+                if (indData.some(v => v > 0) || indData.length > 0) {
+                    datasets.push({ label: '個別' + (isCountMode ? '個数' : '売上'), data: indData, backgroundColor: individualColor.bg, borderColor: individualColor.border, borderWidth: 1, datalabels: labelConfig });
+                }
+            }
+            if (salesType === 'all' || salesType === 'premium') {
+                if (premData.some(v => v > 0) || (salesType === 'premium' && premData.length > 0)) {
+                    datasets.push({ label: 'プレミアム' + (isCountMode ? '個数' : '売上'), data: premData, backgroundColor: premiumColor.bg, borderColor: premiumColor.border, borderWidth: 1, datalabels: labelConfig });
+                }
+            }
+
+            const ctx = document.getElementById('itemChart').getContext('2d');
+            if (itemChartInstance) itemChartInstance.destroy();
+            
+            itemChartInstance = new Chart(ctx, {
+                type: 'bar', data: { labels: months, datasets: datasets },
+                options: {
+                    responsive: true, maintainAspectRatio: false, layout: { padding: { top: 25 } },
+                    plugins: {
+                        legend: { display: true, position: 'top', labels: { boxWidth: 12, padding: 15 } },
+                        tooltip: { callbacks: { label: function(context) { return (context.dataset.label || '') + ': ' + formatMetric(context.parsed.y); } } }
+                    },
+                    scales: {
+                        x: { stacked: true, grid: { display: false } },
+                        y: { stacked: true, beginAtZero: true, grace: '15%', grid: { display: false }, ticks: { display: amountDisplay !== 'none', callback: function(value) { return formatMetric(value); } } }
+                    }
+                }
+            });
+            
+            const filterEl = document.getElementById('item-filter-summary');
+            const salesLabel = { all: '個別+プレミアム', individual: '個別のみ', premium: 'プレミアムのみ' }[salesType];
+            const releaseDateText = itemReleaseDateMap[itemId] ? formatDateString(itemReleaseDateMap[itemId]) : '不明';
+            
+            // プレミアム開始日のテキストを準備する
+            const premiumDateText = itemPremiumDateMap[itemId] ? formatDateString(itemPremiumDateMap[itemId]) : '未設定';
+
+            // innerHTMLの最後にプレミアム開始日の表示を追加する
+            filterEl.innerHTML = `<span class="summary-prefix">絞り込み：</span>${salesLabel}<br><span class="summary-prefix">リリース日：</span>${releaseDateText}<br><span class="summary-prefix">プレミアム開始日：</span>${premiumDateText}`;
+           
+        }
+
+
         function updateChart3FilterUI() {
             chart3PremiumStartFilter.innerHTML = '<option value="all">すべて</option>';
             const sortedDates = Array.from(availableChart3PremDates).sort((a, b) => {
@@ -1743,7 +2256,6 @@ setTimeout(() => {
             makeBreakdown(summaryEmojiBreakdown, summary.emoji.individual, summary.emoji.premium);
             makeBreakdown(summaryThemeBreakdown, summary.theme.individual, summary.theme.premium);
 
-            // CSVエクスポート時と同じ形式で売上期間を表示
             const summaryMonths = Object.keys(salesTypeDataObj).sort();
             if (summaryMonths.length > 0) {
                 const minYYMM = summaryMonths[0].substring(2);
@@ -1757,183 +2269,104 @@ setTimeout(() => {
             summaryArea.style.display = 'block';
         }
 
-        // --- サマリーCSV書き出し ---
         function exportSummaryCSV() {
-    const months = Object.keys(salesTypeDataObj).sort();
-    if (months.length === 0) return;
+            const months = Object.keys(salesTypeDataObj).sort();
+            if (months.length === 0) return;
 
-    // 売上個数用のデータを月別・商品種別・個別/プレミアムで集計
-    // rankingCountDataObj は「個数でランキングを見る」と同じ集計元
-    const countByMonth = {};
+            const countByMonth = {};
 
-    Object.values(rankingCountDataObj).forEach(itemData => {
-        Object.entries(itemData).forEach(([monthKey, monthData]) => {
-            if (!countByMonth[monthKey]) {
-                countByMonth[monthKey] = {
-                    individual: { sticker: 0, emoji: 0, theme: 0 },
-                    premium: { sticker: 0, emoji: 0, theme: 0 }
+            Object.values(rankingCountDataObj).forEach(itemData => {
+                Object.entries(itemData).forEach(([monthKey, monthData]) => {
+                    if (!countByMonth[monthKey]) {
+                        countByMonth[monthKey] = {
+                            individual: { sticker: 0, emoji: 0, theme: 0 },
+                            premium: { sticker: 0, emoji: 0, theme: 0 }
+                        };
+                    }
+
+                    countByMonth[monthKey].individual.sticker += monthData.individual.sticker || 0;
+                    countByMonth[monthKey].individual.emoji += monthData.individual.emoji || 0;
+                    countByMonth[monthKey].individual.theme += monthData.individual.theme || 0;
+
+                    countByMonth[monthKey].premium.sticker += monthData.premium.sticker || 0;
+                    countByMonth[monthKey].premium.emoji += monthData.premium.emoji || 0;
+                    countByMonth[monthKey].premium.theme += monthData.premium.theme || 0;
+                });
+            });
+
+            const headers = [
+                '売上年月', 'スタンプ個数', '絵文字個数', '着せ替え個数', '合計売上個数',
+                '個別スタンプ金額', '個別絵文字金額', '個別着せ替え金額', '合計個別金額',
+                'プレミアムスタンプ金額', 'プレミアム絵文字金額', 'プレミアム着せ替え金額', '合計プレミアム金額', '売上総額'
+            ];
+
+            const rows = [headers];
+
+            [...months].sort().reverse().forEach(monthKey => {
+                const countData = countByMonth[monthKey] || {
+                    individual: { sticker: 0, emoji: 0, theme: 0 }, premium: { sticker: 0, emoji: 0, theme: 0 }
                 };
+
+                const stickerCount = (countData.individual.sticker || 0) + (countData.premium.sticker || 0);
+                const emojiCount = (countData.individual.emoji || 0) + (countData.premium.emoji || 0);
+                const themeCount = (countData.individual.theme || 0) + (countData.premium.theme || 0);
+                const totalCount = stickerCount + emojiCount + themeCount;
+
+                const salesData = salesTypeDataObj[monthKey] || {
+                    individual: { total: 0, sticker: 0, emoji: 0, theme: 0 }, premium: { total: 0, sticker: 0, emoji: 0, theme: 0 }
+                };
+
+                const individualSticker = salesData.individual.sticker || 0;
+                const individualEmoji = salesData.individual.emoji || 0;
+                const individualTheme = salesData.individual.theme || 0;
+                const premiumSticker = salesData.premium.sticker || 0;
+                const premiumEmoji = salesData.premium.emoji || 0;
+                const premiumTheme = salesData.premium.theme || 0;
+
+                const totalIndividual = individualSticker + individualEmoji + individualTheme;
+                const totalPremium = premiumSticker + premiumEmoji + premiumTheme;
+                const totalSales = totalIndividual + totalPremium;
+
+                rows.push([
+                    monthKey, Math.round(stickerCount), Math.round(emojiCount), Math.round(themeCount), Math.round(totalCount),
+                    Math.round(individualSticker), Math.round(individualEmoji), Math.round(individualTheme), Math.round(totalIndividual),
+                    Math.round(premiumSticker), Math.round(premiumEmoji), Math.round(premiumTheme), Math.round(totalPremium), Math.round(totalSales)
+                ]);
+            });
+
+            const escapeCSV = value => {
+                const str = String(value ?? '');
+                return /[",\r\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+            };
+
+            const csvString = rows.map(row => row.map(escapeCSV).join(',')).join('\r\n');
+            let fileName = '売上サマリー.csv';
+
+            if (months.length > 0) {
+                const minYYMM = months[0].replace('/', '').slice(2);
+                const maxYYMM = months[months.length - 1].replace('/', '').slice(2);
+                fileName = (minYYMM === maxYYMM) ? `${minYYMM}_売上サマリー.csv` : `${minYYMM}-${maxYYMM}_売上サマリー.csv`;
             }
+            fileName = sanitizeFileName(fileName); 
 
-            countByMonth[monthKey].individual.sticker += monthData.individual.sticker || 0;
-            countByMonth[monthKey].individual.emoji += monthData.individual.emoji || 0;
-            countByMonth[monthKey].individual.theme += monthData.individual.theme || 0;
+            const blob = new Blob(["\uFEFF" + csvString], { type: 'text/csv;charset=utf-8;' });
+            const file = new File([blob], fileName, { type: 'text/csv' });
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-            countByMonth[monthKey].premium.sticker += monthData.premium.sticker || 0;
-            countByMonth[monthKey].premium.emoji += monthData.premium.emoji || 0;
-            countByMonth[monthKey].premium.theme += monthData.premium.theme || 0;
-        });
-    });
+            if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
+                navigator.share({ files: [file], title: fileName }).catch(err => console.log('共有がキャンセルされました:', err));
+            } else {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+            }
+        }
 
-    // ヘッダー
-    const headers = [
-        '売上年月',
-        'スタンプ個数',
-        '絵文字個数',
-        '着せ替え個数',
-        '合計売上個数',
-        '個別スタンプ金額',
-        '個別絵文字金額',
-        '個別着せ替え金額',
-        '合計個別金額',
-        'プレミアムスタンプ金額',
-        'プレミアム絵文字金額',
-        'プレミアム着せ替え金額',
-        '合計プレミアム金額',
-        '売上総額'
-    ];
-
-    const rows = [headers];
-
-    // 売上年月は新しい月から順番にする
-    [...months].sort().reverse().forEach(monthKey => {
-
-        // 個数
-        const countData = countByMonth[monthKey] || {
-            individual: { sticker: 0, emoji: 0, theme: 0 },
-            premium: { sticker: 0, emoji: 0, theme: 0 }
-        };
-
-        const stickerCount =
-            (countData.individual.sticker || 0) +
-            (countData.premium.sticker || 0);
-
-        const emojiCount =
-            (countData.individual.emoji || 0) +
-            (countData.premium.emoji || 0);
-
-        const themeCount =
-            (countData.individual.theme || 0) +
-            (countData.premium.theme || 0);
-
-        const totalCount =
-            stickerCount +
-            emojiCount +
-            themeCount;
-
-        // 金額
-        const salesData = salesTypeDataObj[monthKey] || {
-            individual: { total: 0, sticker: 0, emoji: 0, theme: 0 },
-            premium: { total: 0, sticker: 0, emoji: 0, theme: 0 }
-        };
-
-        const individualSticker = salesData.individual.sticker || 0;
-        const individualEmoji = salesData.individual.emoji || 0;
-        const individualTheme = salesData.individual.theme || 0;
-
-        const premiumSticker = salesData.premium.sticker || 0;
-        const premiumEmoji = salesData.premium.emoji || 0;
-        const premiumTheme = salesData.premium.theme || 0;
-
-        const totalIndividual =
-            individualSticker +
-            individualEmoji +
-            individualTheme;
-
-        const totalPremium =
-            premiumSticker +
-            premiumEmoji +
-            premiumTheme;
-
-        const totalSales =
-            totalIndividual +
-            totalPremium;
-
-        rows.push([
-            monthKey,
-            Math.round(stickerCount),
-            Math.round(emojiCount),
-            Math.round(themeCount),
-            Math.round(totalCount),
-            Math.round(individualSticker),
-            Math.round(individualEmoji),
-            Math.round(individualTheme),
-            Math.round(totalIndividual),
-            Math.round(premiumSticker),
-            Math.round(premiumEmoji),
-            Math.round(premiumTheme),
-            Math.round(totalPremium),
-            Math.round(totalSales)
-        ]);
-    });
-
-    // CSV文字列作成
-    const escapeCSV = value => {
-        const str = String(value ?? '');
-        return /[",\r\n]/.test(str)
-            ? `"${str.replace(/"/g, '""')}"`
-            : str;
-    };
-
-    const csvString = rows
-        .map(row => row.map(escapeCSV).join(','))
-        .join('\r\n');
-
-    // ファイル名を先に決める
-    let fileName = '売上サマリー.csv';
-
-    if (months.length > 0) {
-        const minYYMM = months[0].replace('/', '').slice(2);
-        const maxYYMM = months[months.length - 1].replace('/', '').slice(2);
-
-        fileName = (minYYMM === maxYYMM)
-            ? `${minYYMM}_売上サマリー.csv`
-            : `${minYYMM}-${maxYYMM}_売上サマリー.csv`;
-    }
-    fileName = sanitizeFileName(fileName); // 既存のファイル名サニタイズ処理
-
-    // UTF-8 BOM付きでExcel文字化け対策
-    const blob = new Blob(
-        ["\uFEFF" + csvString],
-        { type: 'text/csv;charset=utf-8;' }
-    );
-
-    // ★追加・変更：スマホ・タブレット判定と共有メニューの処理
-    const file = new File([blob], fileName, { type: 'text/csv' });
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-    if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
-        // スマホの場合：共有メニュー（保存・送信など）を開く
-        navigator.share({
-            files: [file],
-            title: fileName
-        }).catch(err => console.log('共有がキャンセルされました:', err));
-    } else {
-        // PC等の場合：従来のワンクリックで直接ダウンロード
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = fileName;
-
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-    }
-}
-
-        // --- 1つ目のグラフ描画 (データ無し商品は凡例非表示) ---
         function drawChart() {
             const labels = Object.keys(globalMonthlyData).sort();
             if (labels.length === 0) return;
@@ -1944,7 +2377,6 @@ setTimeout(() => {
             const isCountMode = chart1CountCheckbox.checked;
             const amountDisplayMode = document.querySelector('input[name="chart1-amount-display"]:checked').value;
             const sourceData = isCountMode ? globalMonthlyCountData : globalMonthlyData;
-            const unitLabel = isCountMode ? '個' : '¥';
 
             chart1Title.textContent = isCountMode ? '月別売上個数' : '月別売上金額';
             chart1ValueDisplayLabel.textContent = isCountMode ? '個数表示:' : '金額表示:';
@@ -2044,9 +2476,9 @@ setTimeout(() => {
                         datalabels: { display: false } 
                     },
                     scales: {
-                        x: { stacked: isStacked, grid: { display: false } },
-                        y: { stacked: isStacked, beginAtZero: true, grid: { display: false }, ticks: { display: amountDisplayMode !== 'none', callback: function(value) { return isCountMode ? Math.round(value).toLocaleString() + '個' : '¥' + value.toLocaleString(); } } }
-                    }
+    x: { stacked: isStacked, grid: { display: false } },
+    y: { stacked: isStacked, beginAtZero: true, grace: '15%', grid: { display: false }, ticks: { display: amountDisplayMode !== 'none', callback: function(value) { return isCountMode ? Math.round(value).toLocaleString() + '個' : '¥' + value.toLocaleString(); } } }
+}
                 }
             });
         }
@@ -2078,7 +2510,7 @@ setTimeout(() => {
             const datasets = [];
             const viewType2 = document.querySelector('input[name="chart2-type"]:checked').value;
             const amountDisplayMode = document.querySelector('input[name="chart2-amount-display"]:checked').value; 
-            const is100Percent = document.getElementById('chart2-100percent-checkbox').checked; // ★追加：チェック状態の取得
+            const is100Percent = document.getElementById('chart2-100percent-checkbox').checked; 
             if (monthsLabels && monthsLabels.length > 0) updateChart2FilterSummary(monthsLabels[0], monthsLabels[monthsLabels.length - 1]);
             const propKey = viewType2 === 'all' ? 'total' : viewType2;
 
@@ -2091,7 +2523,6 @@ setTimeout(() => {
             const colorPalette = [ '#4dc9f6', '#f67019', '#f53794', '#537bc4', '#acc236', '#166a8f', '#00a950', '#58595b', '#8549ba', '#ffb300', '#005b96', '#ff8b94', '#2c3e50', '#e74c3c', '#27ae60' ];
             let colorIndex = 0;
 
-            // ★追加：100%計算のために各月の合計金額を事前に算出
             const monthlyTotals = {};
             monthsLabels.forEach(month => {
                 let monthTotal = 0;
@@ -2101,7 +2532,6 @@ setTimeout(() => {
                 monthlyTotals[month] = monthTotal;
             });
 
-            // ★変更：金額表示のカスタマイズ（%と金額の出し分け）
             const detailDatalabelsConfig = {
                 display: amountDisplayMode === 'detail', color: '#fff', font: { weight: 'bold', size: 10 },
                 formatter: (value, context) => {
@@ -2129,8 +2559,7 @@ setTimeout(() => {
                         if (chart.isDatasetVisible(i)) sum += Number(chart.data.datasets[i].originalData[context.dataIndex]) || 0;
                     }
                     if (sum <= 0) return '';
-                    // 100%の時は元の売上合計額を「計 ¥〜」と表示する
-                    return (is100Percent ? '¥' : '¥') + sum.toLocaleString();
+                    return '¥' + sum.toLocaleString();
                 },
                 anchor: 'end', align: 'top', color: '#333', font: { weight: 'bold', size: 12 }, textShadowBlur: 0
             };
@@ -2143,7 +2572,6 @@ setTimeout(() => {
                 else if (premCategory === '未設定') color = '#cccccc'; 
                 else { color = colorPalette[colorIndex % colorPalette.length]; colorIndex++; }
                 
-                // ★変更：100%時はデータを割合（0〜100）に変換し、元の金額をoriginalDataとして保持
                 const originalData = monthsLabels.map(month => premiumDataObj[month] && premiumDataObj[month][premCategory] ? premiumDataObj[month][premCategory][propKey] : 0);
                 
                 let dataToUse = originalData;
@@ -2158,7 +2586,7 @@ setTimeout(() => {
                     datasets.push({ 
                         label: premCategory, 
                         data: dataToUse, 
-                        originalData: originalData, // ツールチップ等で参照するための元金額
+                        originalData: originalData, 
                         backgroundColor: color, 
                         borderWidth: 1, 
                         borderColor: '#ffffff', 
@@ -2176,7 +2604,6 @@ setTimeout(() => {
                         tooltip: { 
                             callbacks: { 
                                 label: function(context) { 
-                                    // ★変更：ツールチップで % と 金額 の両方を表示
                                     const rawValue = context.dataset.originalData[context.dataIndex];
                                     const formattedValue = new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(rawValue);
                                     if (is100Percent) {
@@ -2189,48 +2616,95 @@ setTimeout(() => {
                         }
                     },
                     scales: {
-                        x: { stacked: true, grid: { display: false } },
-                        y: { 
-                            stacked: true, 
-                            beginAtZero: true, 
-                            max: is100Percent ? 100 : undefined, // ★変更：100%ならY軸の最大値を100に固定
-                            grid: { display: false }, 
-                            ticks: { 
-                                display: amountDisplayMode !== 'none', 
-                                callback: function(value) { 
-                                    // ★変更：Y軸の目盛りを % に切り替え
-                                    return is100Percent ? value + '%' : '¥' + value.toLocaleString(); 
-                                } 
-                            } 
-                        }
-                    }
+    x: { stacked: true, grid: { display: false } },
+    y: { 
+        stacked: true, 
+        beginAtZero: true, 
+        max: is100Percent ? 100 : undefined, 
+        grace: '15%', 
+        grid: { display: false }, 
+        ticks: { display: amountDisplayMode !== 'none', callback: function(value) { return is100Percent ? value + '%' : '¥' + value.toLocaleString(); } } 
+    }
+}
                 }
             });
         }
-        // --- 3つ目のグラフ描画 (データ無しデータセットは凡例非表示) ---
-        function drawSalesTypeChart() {
-            const labels = Object.keys(salesTypeDataObj).sort();
-            if (labels.length === 0) return;
-            chartArea3.style.display = 'block';
 
-            const viewType = document.querySelector('input[name="chart3-type"]:checked').value;
-            const amountDisplayMode = document.querySelector('input[name="chart3-amount-display"]:checked').value;
+        function drawSalesTypeChart() {
             const filterValue = chart3PremiumStartFilter.value; 
             updateChart3FilterSummary();
+
+            const isCountMode = document.getElementById('chart3-count-checkbox').checked;
+            const salesTypeFilter = document.querySelector('input[name="chart3-sales-type"]:checked').value;
+            const viewType = document.querySelector('input[name="chart3-type"]:checked').value;
+            const amountDisplayMode = document.querySelector('input[name="chart3-amount-display"]:checked').value;
+            const propKey = viewType === 'all' ? 'total' : viewType;
+            
+            document.getElementById('chart3-value-display-label').textContent = isCountMode ? '個数表示:' : '金額表示:';
+            const titleEl = document.getElementById('chart3-title');
+            if (titleEl) {
+                titleEl.textContent = isCountMode ? '月別売上個数 (個別売上 vs プレミアム売上)' : '月別売上金額 (個別売上 vs プレミアム売上)';
+            }
+
+            const baseDataObj = isCountMode ? salesTypeCountDataObj : salesTypeDataObj;
+            const baseDataByPremDate = isCountMode ? salesTypeCountDataByPremDate : salesTypeDataByPremDate;
+
+            const targetDataObj = (filterValue === 'all') ? baseDataObj : (baseDataByPremDate[filterValue] || {});
+            const dataMonths = Object.keys(targetDataObj).sort();
+
+            if (dataMonths.length === 0) {
+                if (salesTypeChartInstance) salesTypeChartInstance.destroy();
+                return;
+            }
+            
+            chartArea3.style.display = 'block';
+
+            let startMonth = premDateReleaseMonthMap[filterValue] || dataMonths[0];
+            if (dataMonths[0] < startMonth) {
+                startMonth = dataMonths[0];
+            }
+
+            let endMonth = availableMonths && availableMonths.length > 0 ? availableMonths[availableMonths.length - 1] : dataMonths[dataMonths.length - 1];
+            if (dataMonths[dataMonths.length - 1] > endMonth) {
+                endMonth = dataMonths[dataMonths.length - 1];
+            }
+
+            const months = getMonthsBetween(startMonth, endMonth);
 
             const ctx = document.getElementById('salesTypeChart').getContext('2d');
             if (salesTypeChartInstance) salesTypeChartInstance.destroy();
 
-            const propKey = viewType === 'all' ? 'total' : viewType;
-            const targetDataObj = (filterValue === 'all') ? salesTypeDataObj : (salesTypeDataByPremDate[filterValue] || {});
+            const formatMetric = (value) => {
+                return isCountMode ? Math.round(value || 0).toLocaleString('ja-JP') + '個' : '¥' + Math.round(value || 0).toLocaleString('ja-JP');
+            };
 
             const detailDatalabelsConfig = {
                 display: amountDisplayMode === 'detail', color: '#fff', font: { weight: 'bold', size: 10 },
-                formatter: (value) => value > 0 ? '¥' + value.toLocaleString() : '', anchor: 'center', align: 'center',
+                formatter: (value) => value > 0 ? formatMetric(value) : '', anchor: 'center', align: 'center',
                 textShadowBlur: 3, textShadowColor: 'rgba(0,0,0,0.5)'
             };
+            
+            const dynamicTotalDatalabelsConfigChart3 = {
+                display: function(context) {
+                    const chart = context.chart;
+                    let lastVisible = -1;
+                    for (let i = chart.data.datasets.length - 1; i >= 0; i--) {
+                        if (chart.isDatasetVisible(i)) { lastVisible = i; break; }
+                    }
+                    return context.datasetIndex === lastVisible;
+                },
+                formatter: function(value, context) {
+                    const chart = context.chart;
+                    let sum = 0;
+                    for (let i = 0; i < chart.data.datasets.length; i++) {
+                        if (chart.isDatasetVisible(i)) sum += Number(chart.data.datasets[i].data[context.dataIndex]) || 0;
+                    }
+                    return sum > 0 ? formatMetric(sum) : '';
+                },
+                anchor: 'end', align: 'top', color: '#333', font: { weight: 'bold', size: 12 }, textShadowBlur: 0
+            };
 
-            let labelConfig = amountDisplayMode === 'detail' ? detailDatalabelsConfig : (amountDisplayMode === 'total' ? dynamicTotalDatalabelsConfig : { display: false });
+            let labelConfig = amountDisplayMode === 'detail' ? detailDatalabelsConfig : (amountDisplayMode === 'total' ? dynamicTotalDatalabelsConfigChart3 : { display: false });
 
             const chart3ItemColors = {
                 sticker: { bg: 'rgba(157, 199, 147, 0.7)', border: 'rgba(157, 199, 147, 1)' },
@@ -2246,28 +2720,33 @@ setTimeout(() => {
             };
             const premiumColor = viewType === 'all' ? { bg: '#dee34b', border: '#ffffff' } : premiumColors[viewType];
 
-            const indData = labels.map(l => targetDataObj[l] ? targetDataObj[l].individual[propKey] : 0);
-            const premData = labels.map(l => targetDataObj[l] ? targetDataObj[l].premium[propKey] : 0);
+            const indData = months.map(m => targetDataObj[m] ? targetDataObj[m].individual[propKey] : 0);
+            const premData = months.map(m => targetDataObj[m] ? targetDataObj[m].premium[propKey] : 0);
 
             const datasets = [];
-            if (indData.some(v => v > 0)) {
-                datasets.push({ label: '個別売上', data: indData, backgroundColor: individualColor.bg, borderWidth: 1, borderColor: individualColor.border, datalabels: labelConfig });
+            
+            if (salesTypeFilter === 'all' || salesTypeFilter === 'individual') {
+                if (indData.some(v => v > 0) || indData.length > 0) {
+                    datasets.push({ label: '個別' + (isCountMode ? '個数' : '売上'), data: indData, backgroundColor: individualColor.bg, borderWidth: 1, borderColor: individualColor.border, datalabels: labelConfig });
+                }
             }
-            if (premData.some(v => v > 0)) {
-                datasets.push({ label: 'プレミアム売上', data: premData, backgroundColor: premiumColor.bg, borderWidth: 1, borderColor: premiumColor.border, datalabels: labelConfig });
+            if (salesTypeFilter === 'all' || salesTypeFilter === 'premium') {
+                if (premData.some(v => v > 0) || (salesTypeFilter === 'premium' && premData.length > 0)) {
+                    datasets.push({ label: 'プレミアム' + (isCountMode ? '個数' : '売上'), data: premData, backgroundColor: premiumColor.bg, borderWidth: 1, borderColor: premiumColor.border, datalabels: labelConfig });
+                }
             }
 
             salesTypeChartInstance = new Chart(ctx, {
-                type: 'bar', data: { labels: labels, datasets: datasets },
+                type: 'bar', data: { labels: months, datasets: datasets },
                 options: {
                     responsive: true, maintainAspectRatio: false, layout: { padding: { top: 25 } }, 
                     plugins: {
                         legend: { position: 'top', labels: { boxWidth: 12, padding: 15 } },
-                        tooltip: { callbacks: { label: function(context) { return (context.dataset.label || '') + ': ' + new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(context.parsed.y); } } }
+                        tooltip: { callbacks: { label: function(context) { return (context.dataset.label || '') + ': ' + formatMetric(context.parsed.y); } } }
                     },
                     scales: {
                         x: { stacked: true, grid: { display: false } },
-                        y: { stacked: true, beginAtZero: true, grid: { display: false }, ticks: { display: amountDisplayMode !== 'none', callback: function(value) { return '¥' + value.toLocaleString(); } } }
+                        y: { stacked: true, beginAtZero: true, grace: '15%', grid: { display: false }, ticks: { display: amountDisplayMode !== 'none', callback: function(value) { return formatMetric(value); } } }
                     }
                 }
             });
@@ -2280,7 +2759,6 @@ setTimeout(() => {
             };
         }
 
-        // 4～6番グラフ共通：現在の絞り込み条件を画像にも写る形で表示
         function formatRankingFilterMonth(monthValue) {
             const match = String(monthValue || '').match(/^(\d{4})\/(\d{1,2})$/);
             if (!match) return String(monthValue || '-');
@@ -2292,16 +2770,11 @@ setTimeout(() => {
             if (!el) return;
 
             const itemLabel = {
-                all: '全商品分',
-                sticker: 'スタンプのみ',
-                emoji: '絵文字のみ',
-                theme: '着せ替えのみ'
+                all: '全商品分', sticker: 'スタンプのみ', emoji: '絵文字のみ', theme: '着せ替えのみ'
             }[itemTypeFilter] || itemTypeFilter;
 
             const salesLabel = {
-                all: '個別+プレミアム',
-                individual: '個別のみ',
-                premium: 'プレミアムのみ'
+                all: '個別+プレミアム', individual: '個別のみ', premium: 'プレミアムのみ'
             }[salesTypeFilter] || salesTypeFilter;
 
             const startLabel = formatRankingFilterMonth(startMonth);
@@ -2312,12 +2785,7 @@ setTimeout(() => {
         }
 
         function getChartFilterItemLabel(value) {
-            return {
-                all: '全商品分',
-                sticker: 'スタンプのみ',
-                emoji: '絵文字のみ',
-                theme: '着せ替えのみ'
-            }[value] || value || '-';
+            return { all: '全商品分', sticker: 'スタンプのみ', emoji: '絵文字のみ', theme: '着せ替えのみ' }[value] || value || '-';
         }
 
         function updateChart1FilterSummary() {
@@ -2341,15 +2809,101 @@ setTimeout(() => {
             const el = document.getElementById('chart3-filter-summary');
             if (!el) return;
             const viewType = document.querySelector('input[name="chart3-type"]:checked')?.value || 'all';
+            const salesType = document.querySelector('input[name="chart3-sales-type"]:checked')?.value || 'all';
             const premiumMonth = chart3PremiumStartFilter.value || 'all';
             const premiumLabel = premiumMonth === 'all' ? 'すべて' : formatRankingFilterMonth(premiumMonth);
-            el.innerHTML = `<span class="summary-prefix">絞り込み：</span>${getChartFilterItemLabel(viewType)}・プレミアム月：${premiumLabel}`;
+            const salesLabel = { all: '個別+プレミアム', individual: '個別のみ', premium: 'プレミアムのみ' }[salesType];
+            
+            el.innerHTML = `<span class="summary-prefix">絞り込み：</span>${getChartFilterItemLabel(viewType)}・${salesLabel}・プレミアム月：${premiumLabel}`;
         }
 
 
         function sanitizeFileName(text) { return String(text).replace(/[\\/:*?"<>|]/g, '_'); }
 
         function formatRankingMetric(value) { return rankingCountCheckbox.checked ? Math.round(value || 0).toLocaleString('ja-JP') + '個' : '¥' + Math.round(value || 0).toLocaleString('ja-JP'); }
+
+        // 極端に値が低い（棒が短い）場合の内訳ラベルをグラフの外に押し出して描画する処理
+        function getRankingDetailDatalabelsConfig(amountDisplay) {
+            return {
+                display: function(context) {
+                    if (amountDisplay !== 'detail') return false;
+                    const value = Number(context.dataset.data[context.dataIndex]) || 0;
+                    return value > 0;
+                },
+                formatter: (value) => formatRankingMetric(value),
+                font: { weight: 'bold', size: 10 },
+                anchor: function(context) {
+                    const value = Number(context.dataset.data[context.dataIndex]) || 0;
+                    let sum = 0;
+                    let firstVisibleIndex = -1;
+                    let lastVisibleIndex = -1;
+                    
+                    context.chart.data.datasets.forEach((ds, i) => { 
+                        const val = Number(ds.data[context.dataIndex]) || 0;
+                        sum += val; 
+                        if (val > 0) {
+                            if (firstVisibleIndex === -1) firstVisibleIndex = i;
+                            lastVisibleIndex = i;
+                        }
+                    });
+                    
+                    const isSmall = sum > 0 && (value / sum) < 0.08;
+                    
+                    if (isSmall) {
+                        const isLastVisible = context.datasetIndex === lastVisibleIndex;
+                        const isFirstVisible = context.datasetIndex === firstVisibleIndex;
+                        if (isLastVisible) return 'end';
+                        if (isFirstVisible) return 'start';
+                        return 'center';
+                    }
+                    return 'center';
+                },
+                align: function(context) {
+                    const value = Number(context.dataset.data[context.dataIndex]) || 0;
+                    let sum = 0;
+                    let firstVisibleIndex = -1;
+                    let lastVisibleIndex = -1;
+                    
+                    context.chart.data.datasets.forEach((ds, i) => { 
+                        const val = Number(ds.data[context.dataIndex]) || 0;
+                        sum += val; 
+                        if (val > 0) {
+                            if (firstVisibleIndex === -1) firstVisibleIndex = i;
+                            lastVisibleIndex = i;
+                        }
+                    });
+                    
+                    const isSmall = sum > 0 && (value / sum) < 0.08;
+                    
+                    if (isSmall) {
+                        const isLastVisible = context.datasetIndex === lastVisibleIndex;
+                        const isFirstVisible = context.datasetIndex === firstVisibleIndex;
+                        if (isLastVisible) return 'right';  // 一番右の要素は右側に押し出す
+                        if (isFirstVisible) return 'left';  // 一番左の要素は左側に押し出す
+                        return 'top';                       // 中間の要素は上側に配置 (基本的に発生しづらくなる)
+                    }
+                    return 'center';
+                },
+                color: function(context) {
+                    const value = Number(context.dataset.data[context.dataIndex]) || 0;
+                    let sum = 0;
+                    context.chart.data.datasets.forEach(ds => { sum += Number(ds.data[context.dataIndex]) || 0; });
+                    const isSmall = sum > 0 && (value / sum) < 0.08;
+                    
+                    // バーの外側（白背景）に配置される場合は文字色をグレーにして可読性を保つ
+                    return isSmall ? '#555' : '#fff';
+                },
+                textShadowBlur: function(context) {
+                    const value = Number(context.dataset.data[context.dataIndex]) || 0;
+                    let sum = 0;
+                    context.chart.data.datasets.forEach(ds => { sum += Number(ds.data[context.dataIndex]) || 0; });
+                    const isSmall = sum > 0 && (value / sum) < 0.08;
+                    
+                    // バーの外側の場合は影を無効化
+                    return isSmall ? 0 : 3;
+                }
+            };
+        }
 
         function exportRankingCSV() {
             if (!currentRankingExport || currentRankingExport.itemTotals.length === 0) return;
@@ -2367,28 +2921,20 @@ setTimeout(() => {
             const csvString = Papa.unparse(rows);
             const blob = new Blob(["\uFEFF" + csvString], { type: 'text/csv;charset=utf-8;' });
             
-            // ファイル名の生成
             const { item, sales } = getRankingFilterLabel(itemTypeFilter, salesTypeFilter);
             let fileName = `商品売上ランキング_${isCountMode ? '個数_' : ''}${String(startMonth).replace('/','').slice(2)}-${String(endMonth).replace('/','').slice(2)}_${item}_${sales}.csv`;
-            fileName = sanitizeFileName(fileName); // ファイル名をクリーンに
+            fileName = sanitizeFileName(fileName); 
 
-            // ★追加・変更：スマホ・タブレット判定と共有メニューの処理
             const file = new File([blob], fileName, { type: 'text/csv;charset=utf-8;' });
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
             if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
-                // スマホの場合：共有メニューを開く
-                navigator.share({
-                    files: [file],
-                    title: fileName
-                }).catch(err => console.log('共有がキャンセルされました:', err));
+                navigator.share({ files: [file], title: fileName }).catch(err => console.log('共有がキャンセルされました:', err));
             } else {
-                // PC等の場合：ワンクリックで直接ダウンロード
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a'); 
                 link.href = url; 
                 link.download = fileName;
-
                 document.body.appendChild(link); 
                 link.click(); 
                 link.remove(); 
@@ -2446,47 +2992,38 @@ setTimeout(() => {
 
             const rankingContainer = document.getElementById('rankingChart').parentElement;
             const isCompactRanking4 = showAll4.checked;
-            // TOP5は従来どおり、全件表示時だけ1件あたりの高さを圧縮
             const rankingRowHeight4 = isCompactRanking4 ? 24 : 42;
             rankingContainer.style.height = `${Math.max(220, displayItems.length * rankingRowHeight4 + 80)}px`;
 
             const ctx = document.getElementById('rankingChart').getContext('2d');
             if (rankingChartInstance) rankingChartInstance.destroy();
 
+            const chartLabels = displayItems.map((item, index) => hideName4.checked ? `${index + 1}位` : item.name);
+
+            // getRankingDetailDatalabelsConfig() を設定
             const datasets = series.map(s => ({
                 label: s.label, data: displayItems.map(item => item.totals[s.salesType][s.itemType]),
                 backgroundColor: s.color.bg, borderColor: s.color.border, borderWidth: 1, borderRadius: 4, barThickness: isCompactRanking4 ? 12 : undefined,
-                datalabels: { display: amountDisplay === 'detail', anchor: 'center', align: 'center', color: '#fff', font: { weight: 'bold', size: 10 }, formatter: (value) => value > 0 ? formatRankingMetric(value) : '' }
+                datalabels: getRankingDetailDatalabelsConfig(amountDisplay)
             }));
 
-            // ★ amountDisplay が 'total' の時だけ上書きするように条件を追加
-if (datasets.length > 0 && amountDisplay === 'total') {
-    datasets[datasets.length - 1].datalabels = {
-        display: context => context.datasetIndex === datasets.length - 1,
-        anchor: 'end', align: 'right', color: '#333', font: { weight: 'bold', size: 12 },
-        formatter: (value, context) => { let sum = 0; datasets.forEach(ds => sum += Number(ds.data[context.dataIndex]) || 0); return sum > 0 ? formatRankingMetric(sum) : ''; }
-    };
-}
+            if (datasets.length > 0 && amountDisplay === 'total') {
+                datasets[datasets.length - 1].datalabels = {
+                    display: context => context.datasetIndex === datasets.length - 1,
+                    anchor: 'end', align: 'right', color: '#333', font: { weight: 'bold', size: 12 },
+                    formatter: (value, context) => { let sum = 0; datasets.forEach(ds => sum += Number(ds.data[context.dataIndex]) || 0); return sum > 0 ? formatRankingMetric(sum) : ''; }
+                };
+            }
 
             rankingChartInstance = new Chart(ctx, {
-                type: 'bar', data: { labels: displayItems.map(item => item.name), datasets: datasets },
+                type: 'bar', data: { labels: chartLabels, datasets: datasets },
                 options: {
+                    onClick: (e, elements, chart) => handleRankingChartClick(e, elements, chart, displayItems),
+                    onHover: (e, elements, chart) => handleRankingChartHover(e, elements, chart),
                     indexAxis: 'y', responsive: true, maintainAspectRatio: false, layout: { padding: { right: 80, left: 30 } },
-     scales: {
-    x: { stacked: true, beginAtZero: true, grid: { display: true, color: '#f0f0f0' }, ticks: { display: amountDisplay !== 'none', callback: value => formatRankingMetric(value) } },
-    y: {
-        stacked: true,
-        grid: { display: false },
-        ticks: {
-            autoSkip: false, // ★ ここを追加！（自動スキップを無効化）
-            font: function(context) {
-                const label = context.tick.label || '';
-                const length = String(label).length;             
-
-                return { size: 12 };
-            }
-        }
-    }
+                    scales: {
+    x: { stacked: true, beginAtZero: true, grid: { display: false }, ticks: { display: amountDisplay !== 'none', callback: value => formatRankingMetric(value) } },
+    y: { stacked: true, grid: { display: false }, ticks: { autoSkip: false, font: function(context) { return { size: 12 }; } } }
 },
                     plugins: {
                         legend: { display: true, position: 'top', labels: { boxWidth: 10, padding: 8, font: { size: 11 }, filter: (item, chartData) => chartData.datasets[item.datasetIndex].data.some(val => Number(val) > 0) } },
@@ -2513,28 +3050,20 @@ if (datasets.length > 0 && amountDisplay === 'total') {
             const csvString = Papa.unparse(rows);
             const blob = new Blob(["\uFEFF" + csvString], { type: 'text/csv;charset=utf-8;' });
             
-            // ファイル名の生成
             const { item, sales } = getRankingFilterLabel(itemTypeFilter, salesTypeFilter);
             let fileName = `プレミアム入り月別商品ランキング_${isCountMode ? '個数_' : ''}${String(premiumMonth).replace('/','').slice(2)}_${String(startMonth).replace('/','').slice(2)}-${String(endMonth).replace('/','').slice(2)}_${item}_${sales}.csv`;
-            fileName = sanitizeFileName(fileName); // ファイル名をクリーンに
+            fileName = sanitizeFileName(fileName); 
 
-            // ★追加・変更：スマホ・タブレット判定と共有メニューの処理
             const file = new File([blob], fileName, { type: 'text/csv' });
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
             if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
-                // スマホの場合：共有メニュー（保存・送信など）を開く
-                navigator.share({
-                    files: [file],
-                    title: fileName
-                }).catch(err => console.log('共有がキャンセルされました:', err));
+                navigator.share({ files: [file], title: fileName }).catch(err => console.log('共有がキャンセルされました:', err));
             } else {
-                // PC等の場合：従来のワンクリックで直接ダウンロード
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a'); 
                 link.href = url; 
                 link.download = fileName;
-
                 document.body.appendChild(link); 
                 link.click(); 
                 link.remove(); 
@@ -2585,7 +3114,6 @@ if (datasets.length > 0 && amountDisplay === 'total') {
 
             const container = document.getElementById('premMonthProductRankingChart').parentElement;
             const isCompactRanking6 = showAll6.checked;
-            // TOP5は従来どおり、全件表示時だけ1件あたりの高さを圧縮
             const rankingRowHeight6 = isCompactRanking6 ? 24 : 42;
             container.style.height = `${Math.max(220, Math.min(displayItems.length * rankingRowHeight6 + 80, 1400))}px`;
 
@@ -2598,43 +3126,33 @@ if (datasets.length > 0 && amountDisplay === 'total') {
                 series.push({ salesType: st, itemType: t, label: `${{individual:'個別', premium:'プレミアム'}[st]}・${{sticker:'スタンプ', emoji:'絵文字', theme:'着せ替え'}[t]}`, color: colorMap[t][st] });
             }));
 
+            const chartLabels = displayItems.map((item, index) => hideName6.checked ? `${index + 1}位` : item.name);
+
+            // getRankingDetailDatalabelsConfig() を設定
             const datasets = series.map(s => ({
                 label: s.label, data: displayItems.map(item => item.totals[s.salesType][s.itemType]),
                 backgroundColor: s.color.bg, borderColor: s.color.border, borderWidth: 1, borderRadius: 4, barThickness: isCompactRanking6 ? 12 : undefined,
-                datalabels: { display: amountDisplay === 'detail', anchor: 'center', align: 'center', color: '#fff', font: { weight: 'bold', size: 10 }, formatter: value => value > 0 ? formatRankingMetric(value) : '' }
+                datalabels: getRankingDetailDatalabelsConfig(amountDisplay)
             }));
 
-            // ★ amountDisplay が 'total' の時だけ上書きするように条件を追加
-if (datasets.length > 0 && amountDisplay === 'total') {
-    datasets[datasets.length - 1].datalabels = {
-        display: context => context.datasetIndex === datasets.length - 1,
-        anchor: 'end', align: 'right', color: '#333', font: { weight: 'bold', size: 12 },
-        formatter: (value, context) => { let sum = 0; datasets.forEach(ds => sum += Number(ds.data[context.dataIndex]) || 0); return sum > 0 ? formatRankingMetric(sum) : ''; }
-    };
-}
+            if (datasets.length > 0 && amountDisplay === 'total') {
+                datasets[datasets.length - 1].datalabels = {
+                    display: context => context.datasetIndex === datasets.length - 1,
+                    anchor: 'end', align: 'right', color: '#333', font: { weight: 'bold', size: 12 },
+                    formatter: (value, context) => { let sum = 0; datasets.forEach(ds => sum += Number(ds.data[context.dataIndex]) || 0); return sum > 0 ? formatRankingMetric(sum) : ''; }
+                };
+            }
 
             premMonthProductRankingChartInstance = new Chart(ctx, {
-                type: 'bar', data: { labels: displayItems.map(item => item.name), datasets },
+                type: 'bar', data: { labels: chartLabels, datasets },
                 options: {
+                    onClick: (e, elements, chart) => handleRankingChartClick(e, elements, chart, displayItems),
+                    onHover: (e, elements, chart) => handleRankingChartHover(e, elements, chart),
                     indexAxis: 'y', responsive: true, maintainAspectRatio: false, layout: { padding: { right: 80, left: 30 } },
-                    
-scales: {
-    x: { stacked: true, beginAtZero: true, grid: { display: true, color: '#f0f0f0' }, ticks: { display: amountDisplay !== 'none', callback: value => formatRankingMetric(value) } },
-    y: {
-        stacked: true,
-        grid: { display: false },
-        ticks: {
-            autoSkip: false, // ★ ここを追加！（自動スキップを無効化）
-            font: function(context) {
-                const label = context.tick.label || '';
-                const length = String(label).length;                
-
-                return { size: 12 };
-            }
-        }
-    }
+                    scales: {
+    x: { stacked: true, beginAtZero: true, grid: { display: false }, ticks: { display: amountDisplay !== 'none', callback: value => formatRankingMetric(value) } },
+    y: { stacked: true, grid: { display: false }, ticks: { autoSkip: false, font: function(context) { return { size: 12 }; } } }
 },
-
                     plugins: {
                         legend: { display: true, position: 'top', labels: { boxWidth: 12, padding: 12, filter: (item, chartData) => chartData.datasets[item.datasetIndex].data.some(val => val > 0) } },
                         tooltip: { callbacks: { label: context => context.dataset.label + ': ' + formatRankingMetric(context.parsed.x), footer: items => '合計: ' + formatRankingMetric(items.reduce((sum, item) => sum + (Number(item.parsed.x) || 0), 0)) } }
@@ -2652,34 +3170,27 @@ scales: {
             const csvString = Papa.unparse(rows);
             const blob = new Blob(["\uFEFF" + csvString], { type: 'text/csv;charset=utf-8;' });
             
-            // ファイル名の生成
             const { item, sales } = getRankingFilterLabel(itemTypeFilter, salesTypeFilter);
             let fileName = `プレミアム入り月別売上ランキング_${isCountMode ? '個数_' : ''}${String(startMonth).replace('/','').slice(2)}-${String(endMonth).replace('/','').slice(2)}_${item}_${sales}.csv`;
-            fileName = sanitizeFileName(fileName); // ファイル名をクリーンに
+            fileName = sanitizeFileName(fileName);
 
-            // ★追加・変更：スマホ・タブレット判定と共有メニューの処理
             const file = new File([blob], fileName, { type: 'text/csv;charset=utf-8;' });
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
             if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
-                // スマホの場合：共有メニューを開く
-                navigator.share({
-                    files: [file],
-                    title: fileName
-                }).catch(err => console.log('共有がキャンセルされました:', err));
+                navigator.share({ files: [file], title: fileName }).catch(err => console.log('共有がキャンセルされました:', err));
             } else {
-                // PC等の場合：ワンクリックで直接ダウンロード
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a'); 
                 link.href = url; 
                 link.download = fileName;
-
                 document.body.appendChild(link); 
                 link.click(); 
                 link.remove(); 
                 setTimeout(() => URL.revokeObjectURL(url), 1000);
             }
         }
+
         function updatePremRankingCsvDownload(premMonthTotals, startMonth, endMonth, itemTypeFilter, salesTypeFilter, isCountMode = false) {
             currentPremMonthRankingExport = { premMonthTotals, startMonth, endMonth, itemTypeFilter, salesTypeFilter, isCountMode };
             premRankingCsvDownload.style.display = 'inline-flex';
@@ -2734,7 +3245,6 @@ scales: {
 
             const container = document.getElementById('premMonthRankingChart').parentElement;
             const isCompactRanking5 = showAll5.checked;
-            // TOP5は従来どおり、全件表示時だけ1件あたりの高さを圧縮
             const rankingRowHeight5 = isCompactRanking5 ? 24 : 42;
             container.style.height = `${Math.max(220, Math.min(displayItems.length * rankingRowHeight5 + 80, 1400))}px`;
 
@@ -2744,43 +3254,41 @@ scales: {
             const datasets = [];
             const currentColorConfig = chart3ColorsMap[itemTypeFilter];
 
+            // getRankingDetailDatalabelsConfig() を設定
             if (salesTypeFilter === 'all' || salesTypeFilter === 'individual') {
-                datasets.push({ label: rankingCountCheckbox.checked ? '個別個数' : '個別売上', data: displayItems.map(item => item.effectiveInd), backgroundColor: currentColorConfig.individual.bg, borderColor: currentColorConfig.individual.border, borderWidth: 1, borderRadius: 4, barThickness: isCompactRanking5 ? 12 : undefined, datalabels: { display: amountDisplay === 'detail', anchor: 'center', align: 'center', color: '#fff', font: { weight: 'bold', size: 10 }, formatter: (value) => value > 0 ? formatRankingMetric(value) : '' } });
+                datasets.push({ 
+                    label: rankingCountCheckbox.checked ? '個別個数' : '個別売上', 
+                    data: displayItems.map(item => item.effectiveInd), 
+                    backgroundColor: currentColorConfig.individual.bg, borderColor: currentColorConfig.individual.border, borderWidth: 1, borderRadius: 4, barThickness: isCompactRanking5 ? 12 : undefined, 
+                    datalabels: getRankingDetailDatalabelsConfig(amountDisplay)
+                });
             }
             if (salesTypeFilter === 'all' || salesTypeFilter === 'premium') {
-                datasets.push({ label: rankingCountCheckbox.checked ? 'プレミアム個数' : 'プレミアム売上', data: displayItems.map(item => item.effectivePrem), backgroundColor: currentColorConfig.premium.bg, borderColor: currentColorConfig.premium.border, borderWidth: 1, borderRadius: 4, barThickness: isCompactRanking5 ? 12 : undefined, datalabels: { display: amountDisplay === 'detail', anchor: 'center', align: 'center', color: '#fff', font: { weight: 'bold', size: 10 }, formatter: (value) => value > 0 ? formatRankingMetric(value) : '' } });
+                datasets.push({ 
+                    label: rankingCountCheckbox.checked ? 'プレミアム個数' : 'プレミアム売上', 
+                    data: displayItems.map(item => item.effectivePrem), 
+                    backgroundColor: currentColorConfig.premium.bg, borderColor: currentColorConfig.premium.border, borderWidth: 1, borderRadius: 4, barThickness: isCompactRanking5 ? 12 : undefined, 
+                    datalabels: getRankingDetailDatalabelsConfig(amountDisplay)
+                });
             }
 
-            // ★ amountDisplay が 'total' の時だけ上書きするように条件を追加
-if (datasets.length > 0 && amountDisplay === 'total') {
-    datasets[datasets.length - 1].datalabels = {
-        display: context => context.datasetIndex === datasets.length - 1,
-        anchor: 'end', align: 'right', color: '#333', font: { weight: 'bold', size: 12 },
-        formatter: (value, context) => { let sum = 0; datasets.forEach(ds => sum += Number(ds.data[context.dataIndex]) || 0); return sum > 0 ? formatRankingMetric(sum) : ''; }
-    };
-}
+            if (datasets.length > 0 && amountDisplay === 'total') {
+                datasets[datasets.length - 1].datalabels = {
+                    display: context => context.datasetIndex === datasets.length - 1,
+                    anchor: 'end', align: 'right', color: '#333', font: { weight: 'bold', size: 12 },
+                    formatter: (value, context) => { let sum = 0; datasets.forEach(ds => sum += Number(ds.data[context.dataIndex]) || 0); return sum > 0 ? formatRankingMetric(sum) : ''; }
+                };
+            }
             premMonthRankingChartInstance = new Chart(ctx, {
                 type: 'bar', data: { labels: labels, datasets: datasets },
                 options: {
+                    onClick: (e, elements, chart) => handlePremMonthRankingChartClick(e, elements, chart, displayItems),
+                    onHover: (e, elements, chart) => handleRankingChartHover(e, elements, chart),                    
                     indexAxis: 'y', responsive: true, maintainAspectRatio: false, layout: { padding: { right: 80, left: 30 } },
-                   // ... 前略 ...
-scales: {
-    x: { stacked: true, beginAtZero: true, grid: { display: true, color: '#f0f0f0' }, ticks: { display: amountDisplay !== 'none', callback: value => formatRankingMetric(value) } },
-    y: {
-        stacked: true,
-        grid: { display: false },
-        ticks: {
-            autoSkip: false, // ★ ここを追加！（自動スキップを無効化）
-            font: function(context) {
-                const label = context.tick.label || '';
-                const length = String(label).length;                
-
-                return { size: 12 };
-            }
-        }
-    }
+                    scales: {
+    x: { stacked: true, beginAtZero: true, grid: { display: false }, ticks: { display: amountDisplay !== 'none', callback: value => formatRankingMetric(value) } },
+    y: { stacked: true, grid: { display: false }, ticks: { autoSkip: false, font: function(context) { return { size: 12 }; } } }
 },
-
                     plugins: {
                         legend: { display: true, position: 'top', labels: { boxWidth: 12, padding: 12 } },
                         tooltip: { callbacks: { label: context => context.dataset.label + ': ' + formatRankingMetric(context.parsed.x), footer: items => '合計: ' + formatRankingMetric(items.reduce((sum, item) => sum + (Number(item.parsed.x) || 0), 0)) } }
@@ -2799,6 +3307,13 @@ scales: {
             chartArea2.style.display = 'none';
             chartArea3.style.display = 'none';
             chartArea4.style.display = 'none';
+            chartArea7.style.display = 'none';
+            
+            document.getElementById('item-id-input').value = '';
+            document.getElementById('item-chart-title').textContent = 'Item ID を入力してください';
+            document.getElementById('item-chart-title').style.color = '#444';
+            if(itemChartInstance) { itemChartInstance.destroy(); itemChartInstance = null; }
+
             executeBtn.disabled = true; 
 
             try {
@@ -2830,9 +3345,9 @@ scales: {
                                 if (row.length >= 2) {
                                     const englishName = String(row[0]).trim(); 
                                     const jpName = String(row[1]).trim();      
-                                    const releaseDate = row.length >= 3 ? String(row[2]).trim() : ""; // ★3列目(インデックス2)からリリース日を取得
+                                    const releaseDate = row.length >= 3 ? String(row[2]).trim() : ""; 
                                     const premiumStartDate = row.length >= 4 ? String(row[3]).trim() : ""; 
-                                    if (englishName) premiumMap[englishName] = { jpName: jpName, startDate: premiumStartDate, releaseDate: releaseDate, englishName: englishName }; // ★releaseDateを保存
+                                    if (englishName) premiumMap[englishName] = { jpName: jpName, startDate: premiumStartDate, releaseDate: releaseDate, englishName: englishName };
                                 }
                             }
                         }
@@ -2900,10 +3415,10 @@ scales: {
                 updateSummary(); updateChart3FilterUI(); drawSalesTypeChart();
                 aggregateRankingData(mergedData, header);
                 aggregatePremMonthRankingData(mergedData, header);
+                aggregateItemData(mergedData, header); 
                 rankingDataObjOriginal = rankingDataObj;
                 premMonthRankingDataObjOriginal = premMonthRankingDataObj;
 
-            // --- 2つ目・ランキングの各種プルダウンの初期化 ---
                 startMonthSelect.innerHTML = '';
                 rankingStartMonthSelect.innerHTML = '';
                 rankingEndMonthSelect.innerHTML = '';
@@ -2916,20 +3431,16 @@ scales: {
                 });
 
                 if (availableMonths.length > 0) {
-                    // 最新月を取得 (availableMonths は古い順に並んでいる前提)
                     const latestMonth = availableMonths[availableMonths.length - 1];
                     const [yyyy, mm] = latestMonth.split('/').map(Number);
                     
-                    // 最新月から5ヶ月前を計算
                     const date = new Date(yyyy, mm - 1, 1);
                     date.setMonth(date.getMonth() - 5);
                     const targetStartMonth = `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}`;
                     
-                    // 算出した開始月が存在するか確認
                     if (availableMonths.includes(targetStartMonth)) {
                         startMonthSelect.value = targetStartMonth;
                     } else {
-                        // 存在しない場合（データが6ヶ月未満など）は、末尾から6番目（または一番古い月）をセット
                         const defaultIndex = Math.max(0, availableMonths.length - 6);
                         startMonthSelect.value = availableMonths[defaultIndex];
                     }
@@ -2940,7 +3451,6 @@ scales: {
                     rankingEndMonthSelect.value = availableMonths[availableMonths.length - 1];
                 }
 
-                // プレミアム入り月のプルダウン選択肢を作成
                 const sortedPremMonths = Object.keys(premMonthRankingDataObj).sort((a, b) => {
                     if (a === '未設定') return 1; if (b === '未設定') return -1;
                     return a.localeCompare(b);
@@ -2951,18 +3461,14 @@ scales: {
                 });
 
                 if (availableMonths.length > 0) {
-                    // 売上データの最新月を取得（例: "2026/07"）
                     const latestSalesMonth = availableMonths[availableMonths.length - 1];
                     
-                    // プレミアム入り月の選択肢の中に、売上最新月と「同じ月」が存在するか確認
                     if (sortedPremMonths.includes(latestSalesMonth)) {
                         rankingPremiumMonthSelect.value = latestSalesMonth;
                     } else {
-                        // 同じ月が存在しない場合は、「売上最新月を超えない範囲」で一番新しいプレミアム入り月を探す
                         let targetPremMonth = '';
                         for (let i = sortedPremMonths.length - 1; i >= 0; i--) {
                             const pm = sortedPremMonths[i];
-                            // 未来の月（latestSalesMonthより大きい値）は無視する
                             if (pm !== '未設定' && pm <= latestSalesMonth) {
                                 targetPremMonth = pm;
                                 break;
@@ -2972,27 +3478,23 @@ scales: {
                         if (targetPremMonth) {
                             rankingPremiumMonthSelect.value = targetPremMonth;
                         } else if (sortedPremMonths.length > 0) {
-                            // 該当がない場合（「未設定」しかない場合など）
                             rankingPremiumMonthSelect.value = sortedPremMonths[sortedPremMonths.length - 1];
                         }
                     }
                 }
 
-                // applyRankingPeriodPreset('latest12');
-                redrawRankingAnalysis(); // ←この1行を新しく追加
+                redrawRankingAnalysis(); 
 
-                // --- ダウンロードCSVの作成 ---
                 const mergedCsvString = Papa.unparse([header, ...mergedData]);
                 const blobMerged = new Blob(["\uFEFF" + mergedCsvString], { type: 'text/csv;charset=utf-8;' });
                 
-                // ★追加・変更：スマホ用のFileオブジェクトを作成し、クリック時の動作を上書き
                 const fileMerged = new File([blobMerged], outputFileName, { type: 'text/csv' });
                 downloadBtnMerged.href = URL.createObjectURL(blobMerged);
                 downloadBtnMerged.download = outputFileName;
                 downloadBtnMerged.onclick = async (e) => {
                     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                     if (isMobile && navigator.canShare && navigator.canShare({ files: [fileMerged] })) {
-                        e.preventDefault(); // PC向けの通常のダウンロードを一旦ストップ
+                        e.preventDefault(); 
                         try {
                             await navigator.share({ files: [fileMerged], title: outputFileName });
                         } catch (err) {
@@ -3002,7 +3504,6 @@ scales: {
                 };
 
                 if (isAlternativeMode) {
-                    
                     const generatedPremHeader = ["英語名", "日本語名", "リリース日", "プレミアム開始日"];
                     const generatedPremRows = [];
                     for (let key in premiumMap) {
@@ -3012,14 +3513,13 @@ scales: {
                     const generatedPremCsvString = Papa.unparse([generatedPremHeader, ...generatedPremRows]);
                     const blobPrem = new Blob(["\uFEFF" + generatedPremCsvString], { type: 'text/csv;charset=utf-8;' });
                     
-                    // スマホ対応
                     const filePrem = new File([blobPrem], "generated_premium.csv", { type: 'text/csv' });
                     downloadBtnPremium.href = URL.createObjectURL(blobPrem);
                     downloadBtnPremium.download = "generated_premium.csv";
                     downloadBtnPremium.onclick = async (e) => {
                         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                         if (isMobile && navigator.canShare && navigator.canShare({ files: [filePrem] })) {
-                            e.preventDefault(); // PC向けの通常のダウンロードを一旦ストップ
+                            e.preventDefault(); 
                             try {
                                 await navigator.share({ files: [filePrem], title: "generated_premium.csv" });
                             } catch (err) {
@@ -3033,6 +3533,8 @@ scales: {
                 }
 
                 downloadArea.style.display = 'block';
+                chartArea7.style.display = 'block'; 
+                
                 statusEl.className = 'status success';
                 statusEl.innerHTML = `マージ完了！ 総件数: ${totalRows.toLocaleString()} 行 / プレミアム情報マッチ: ${matchedCount.toLocaleString()} 行`;
 
