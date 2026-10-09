@@ -2274,8 +2274,13 @@
             if (months.length === 0) return;
 
             const countByMonth = {};
+            const uniqueCountsByMonth = {}; // ★ 種類数をカウントするための変数
 
-            Object.values(rankingCountDataObj).forEach(itemData => {
+            // 個数データと金額データの両方を確認し、売上があった商品種類をカウントします
+            Object.keys(rankingCountDataObj).forEach(itemName => {
+                const itemData = rankingCountDataObj[itemName];
+                const itemRevData = rankingDataObj[itemName]; // 金額データ
+                
                 Object.entries(itemData).forEach(([monthKey, monthData]) => {
                     if (!countByMonth[monthKey]) {
                         countByMonth[monthKey] = {
@@ -2283,7 +2288,11 @@
                             premium: { sticker: 0, emoji: 0, theme: 0 }
                         };
                     }
+                    if (!uniqueCountsByMonth[monthKey]) {
+                        uniqueCountsByMonth[monthKey] = { sticker: 0, emoji: 0, theme: 0 };
+                    }
 
+                    // 既存の個数集計
                     countByMonth[monthKey].individual.sticker += monthData.individual.sticker || 0;
                     countByMonth[monthKey].individual.emoji += monthData.individual.emoji || 0;
                     countByMonth[monthKey].individual.theme += monthData.individual.theme || 0;
@@ -2291,13 +2300,30 @@
                     countByMonth[monthKey].premium.sticker += monthData.premium.sticker || 0;
                     countByMonth[monthKey].premium.emoji += monthData.premium.emoji || 0;
                     countByMonth[monthKey].premium.theme += monthData.premium.theme || 0;
+
+                    // ★ 種類数の集計（売上個数 または 売上金額 が1以上の時に種類数として+1する）
+                    const revData = itemRevData && itemRevData[monthKey] ? itemRevData[monthKey] : { individual: {}, premium: {} };
+                    
+                    const stickerCount = (monthData.individual.sticker || 0) + (monthData.premium.sticker || 0);
+                    const stickerRev = (revData.individual.sticker || 0) + (revData.premium.sticker || 0);
+                    if (stickerCount > 0 || stickerRev > 0) uniqueCountsByMonth[monthKey].sticker++;
+
+                    const emojiCount = (monthData.individual.emoji || 0) + (monthData.premium.emoji || 0);
+                    const emojiRev = (revData.individual.emoji || 0) + (revData.premium.emoji || 0);
+                    if (emojiCount > 0 || emojiRev > 0) uniqueCountsByMonth[monthKey].emoji++;
+
+                    const themeCount = (monthData.individual.theme || 0) + (monthData.premium.theme || 0);
+                    const themeRev = (revData.individual.theme || 0) + (revData.premium.theme || 0);
+                    if (themeCount > 0 || themeRev > 0) uniqueCountsByMonth[monthKey].theme++;
                 });
             });
 
+            // ★ ヘッダーに新しい3項目を追加
             const headers = [
                 '売上年月', 'スタンプ個数', '絵文字個数', '着せ替え個数', '合計売上個数',
                 '個別スタンプ金額', '個別絵文字金額', '個別着せ替え金額', '合計個別金額',
-                'プレミアムスタンプ金額', 'プレミアム絵文字金額', 'プレミアム着せ替え金額', '合計プレミアム金額', '売上総額'
+                'プレミアムスタンプ金額', 'プレミアム絵文字金額', 'プレミアム着せ替え金額', '合計プレミアム金額', '売上総額',
+                'スタンプ売上種類数', '絵文字売上種類数', '着せ替え売上種類数'
             ];
 
             const rows = [headers];
@@ -2327,13 +2353,19 @@
                 const totalPremium = premiumSticker + premiumEmoji + premiumTheme;
                 const totalSales = totalIndividual + totalPremium;
 
+                // ★ その月の種類数データを取得
+                const uniqueData = uniqueCountsByMonth[monthKey] || { sticker: 0, emoji: 0, theme: 0 };
+
+                // ★ 行の末尾に種類数データを含めて追加
                 rows.push([
                     monthKey, Math.round(stickerCount), Math.round(emojiCount), Math.round(themeCount), Math.round(totalCount),
                     Math.round(individualSticker), Math.round(individualEmoji), Math.round(individualTheme), Math.round(totalIndividual),
-                    Math.round(premiumSticker), Math.round(premiumEmoji), Math.round(premiumTheme), Math.round(totalPremium), Math.round(totalSales)
+                    Math.round(premiumSticker), Math.round(premiumEmoji), Math.round(premiumTheme), Math.round(totalPremium), Math.round(totalSales),
+                    uniqueData.sticker, uniqueData.emoji, uniqueData.theme
                 ]);
             });
 
+            // CSVの出力処理
             const escapeCSV = value => {
                 const str = String(value ?? '');
                 return /[",\r\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
