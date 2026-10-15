@@ -673,6 +673,15 @@
                 <label><input type="radio" name="chart3-amount-display" value="none"> 表示しない</label>
             </div>
         </div>
+	
+	<div class="chart-controls-row">
+            <div class="period-selector">
+                <label for="chart3-start-month">対象期間:</label>
+                <select id="chart3-start-month"></select>
+                <span>〜</span>
+                <select id="chart3-end-month"></select>
+            </div>
+        </div>
     </div>
     <div id="chart3-filter-summary" class="chart-filter-summary" aria-live="polite"></div>
     <div class="chart-container">
@@ -1223,6 +1232,9 @@
         const chart3SalesTypeRadios = document.querySelectorAll('input[name="chart3-sales-type"]'); 
         const chart3CountCheckbox = document.getElementById('chart3-count-checkbox'); 
 
+	const chart3StartMonthSelect = document.getElementById('chart3-start-month');
+        const chart3EndMonthSelect = document.getElementById('chart3-end-month');
+
         const rankingItemTypeRadios = document.querySelectorAll('input[name="ranking-item-type"]');
         const rankingSalesTypeRadios = document.querySelectorAll('input[name="ranking-sales-type"]');
         const rankingAmountDisplayRadios = document.querySelectorAll('input[name="ranking-amount-display"]');
@@ -1394,6 +1406,19 @@
         chart3PremiumStartFilter.addEventListener('change', () => {
             if (Object.keys(salesTypeDataObj).length > 0) drawSalesTypeChart();
         });
+
+	function handleChart3PeriodChange(e) {
+            const startVal = chart3StartMonthSelect.value;
+            const endVal = chart3EndMonthSelect.value;
+            // 開始月が終了月を上回った場合に補正する処理
+            if (startVal && endVal && startVal > endVal) {
+                if (e.target.id === 'chart3-start-month') chart3EndMonthSelect.value = startVal;
+                else chart3StartMonthSelect.value = endVal;
+            }
+            if (Object.keys(salesTypeDataObj).length > 0) drawSalesTypeChart();
+        }
+        chart3StartMonthSelect.addEventListener('change', handleChart3PeriodChange);
+        chart3EndMonthSelect.addEventListener('change', handleChart3PeriodChange);
 
         function updateItemAmountDisplayUI() {
             const salesType = document.querySelector('input[name="item-sales-type"]:checked')?.value;
@@ -2690,16 +2715,9 @@
             }
             
             chartArea3.style.display = 'block';
-
-            let startMonth = premDateReleaseMonthMap[filterValue] || dataMonths[0];
-            if (dataMonths[0] < startMonth) {
-                startMonth = dataMonths[0];
-            }
-
-            let endMonth = availableMonths && availableMonths.length > 0 ? availableMonths[availableMonths.length - 1] : dataMonths[dataMonths.length - 1];
-            if (dataMonths[dataMonths.length - 1] > endMonth) {
-                endMonth = dataMonths[dataMonths.length - 1];
-            }
+           
+            let startMonth = chart3StartMonthSelect.value || dataMonths[0];
+            let endMonth = chart3EndMonthSelect.value || (availableMonths.length > 0 ? availableMonths[availableMonths.length - 1] : dataMonths[dataMonths.length - 1]);
 
             const months = getMonthsBetween(startMonth, endMonth);
 
@@ -3456,10 +3474,16 @@
                 rankingEndMonthSelect.innerHTML = '';
                 rankingPremiumMonthSelect.innerHTML = '';
 
+		chart3StartMonthSelect.innerHTML = '';
+                chart3EndMonthSelect.innerHTML = '';
+
                 availableMonths.forEach(m => {
                     startMonthSelect.appendChild(new Option(m, m));
                     rankingStartMonthSelect.appendChild(new Option(m, m));
                     rankingEndMonthSelect.appendChild(new Option(m, m));
+
+		    chart3StartMonthSelect.appendChild(new Option(m, m));
+                    chart3EndMonthSelect.appendChild(new Option(m, m));
                 });
 
                 if (availableMonths.length > 0) {
@@ -3481,6 +3505,9 @@
 
                     rankingStartMonthSelect.value = availableMonths[0];
                     rankingEndMonthSelect.value = availableMonths[availableMonths.length - 1];
+		    
+	            chart3StartMonthSelect.value = availableMonths[0];
+                    chart3EndMonthSelect.value = availableMonths[availableMonths.length - 1];
                 }
 
                 const sortedPremMonths = Object.keys(premMonthRankingDataObj).sort((a, b) => {
