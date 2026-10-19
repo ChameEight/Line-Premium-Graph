@@ -582,6 +582,15 @@
                 <label><input type="radio" name="chart1-amount-display" value="none"> 表示しない</label>
             </div>
         </div>
+
+	<div class="chart-controls-row">
+            <div class="period-selector">
+                <label for="chart1-start-month">対象期間:</label>
+                <select id="chart1-start-month"></select>
+                <span>〜</span>
+                <select id="chart1-end-month"></select>
+            </div>
+        </div>
     </div>
     <div id="chart1-filter-summary" class="chart-filter-summary" aria-live="polite"></div>
     <div class="chart-container">
@@ -1325,6 +1334,10 @@
         const premRankingCsvDownload = document.getElementById('prem-ranking-csv-download');
         const premMonthProductRankingCsvDownload = document.getElementById('prem-month-product-ranking-csv-download');
 
+        // ▼ 【追加】ここに1つ目のグラフ用の変数を定義します
+        const chart1StartMonthSelect = document.getElementById('chart1-start-month');
+        const chart1EndMonthSelect = document.getElementById('chart1-end-month');
+
         const itemSalesTypeRadios = document.querySelectorAll('input[name="item-sales-type"]');
         const itemAmountDisplayRadios = document.querySelectorAll('input[name="item-amount-display"]');
         const itemCountCheckbox = document.getElementById('item-count-checkbox');
@@ -1489,6 +1502,21 @@
         }
         chart3StartMonthSelect.addEventListener('change', handleChart3PeriodChange);
         chart3EndMonthSelect.addEventListener('change', handleChart3PeriodChange);
+
+	function handleChart1PeriodChange(e) {
+            const startVal = chart1StartMonthSelect.value;
+            const endVal = chart1EndMonthSelect.value;
+            if (startVal && endVal && startVal > endVal) {
+                if (e.target.id === 'chart1-start-month') chart1EndMonthSelect.value = startVal;
+                else chart1StartMonthSelect.value = endVal;
+            }
+            if (Object.keys(globalMonthlyData).length > 0) drawChart();
+        }
+	
+	chart1StartMonthSelect.addEventListener('change', handleChart1PeriodChange);
+        chart1EndMonthSelect.addEventListener('change', handleChart1PeriodChange);
+        
+
 	function handleChart8PeriodChange(e) {
             const startVal = chart8StartMonthSelect.value;
             const endVal = chart8EndMonthSelect.value;
@@ -2692,8 +2720,15 @@
         }
 
         function drawChart() {
-            const labels = Object.keys(globalMonthlyData).sort();
-            if (labels.length === 0) return;
+            // ▼ 【修正】全データのキーを取得後、プルダウンで選ばれた期間だけに絞り込む
+            const allLabels = Object.keys(globalMonthlyData).sort();
+            if (allLabels.length === 0) return;
+            
+            let startMonth = chart1StartMonthSelect.value || allLabels[0];
+            let endMonth = chart1EndMonthSelect.value || allLabels[allLabels.length - 1];
+            const labels = getMonthsBetween(startMonth, endMonth);
+            // ▲ 修正ここまで
+
             chartArea.style.display = 'block';
 
             const viewType = document.querySelector('input[name="chart-type"]:checked').value;
@@ -2748,11 +2783,13 @@
             const colorEmoji   = { bg: 'rgba(6, 199, 85, 0.7)', border: 'rgba(6, 199, 85, 1)' }; 
             const colorTheme   = { bg: 'rgba(30, 110, 30, 0.7)', border: 'rgba(30, 110, 30, 1)' }; 
 
+            // ▼ labels を基準にデータをマッピング
             const stickerData = labels.map(l => sourceData[l]?.sticker || 0);
             const emojiData = labels.map(l => sourceData[l]?.emoji || 0);
             const themeData = labels.map(l => sourceData[l]?.theme || 0);
             const totalData = labels.map(l => sourceData[l]?.total || 0);
-
+            
+           
             if (viewType === 'all') {
                 if (isColorCoded) {
                     isStacked = true;
@@ -3109,6 +3146,8 @@
             const el = document.getElementById('chart1-filter-summary');
             if (!el) return;
             const viewType = document.querySelector('input[name="chart-type"]:checked')?.value || 'all';
+            
+            // 期間を表示せず、商品選択の情報（全商品分・スタンプのみなど）だけにする
             el.innerHTML = `<span class="summary-prefix">絞り込み：</span>${getChartFilterItemLabel(viewType)}`;
         }
 
@@ -3758,6 +3797,8 @@
                     chart3EndMonthSelect.appendChild(new Option(m, m));
 		    chart8StartMonthSelect.appendChild(new Option(m, m));
                     chart8EndMonthSelect.appendChild(new Option(m, m));
+		    chart1StartMonthSelect.appendChild(new Option(m, m));
+                    chart1EndMonthSelect.appendChild(new Option(m, m));
                 });
 
                 if (availableMonths.length > 0) {
@@ -3784,8 +3825,10 @@
                     chart3EndMonthSelect.value = availableMonths[availableMonths.length - 1];
                     chart8StartMonthSelect.value = availableMonths[0];
                     chart8EndMonthSelect.value = availableMonths[availableMonths.length - 1];
+                    chart1StartMonthSelect.value = availableMonths[0];
+                    chart1EndMonthSelect.value = availableMonths[availableMonths.length - 1];
                 }
-
+			
                 const sortedPremMonths = Object.keys(premMonthRankingDataObj).sort((a, b) => {
                     if (a === '未設定') return 1; if (b === '未設定') return -1;
                     return a.localeCompare(b);
