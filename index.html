@@ -866,6 +866,63 @@
     </div>
 </div>
 
+<!-- 8つ目のグラフ：売れた種類数の推移 -->
+<div id="unique-count-area" class="chart-section" style="padding-bottom: 30px; display: none;">
+    <h2 class="step-title" style="text-align: center;">売れた種類数の推移</h2>
+    
+    <div class="chart-controls-wrapper" data-html2canvas-ignore="true">
+        <div class="chart-controls-row">
+            <div class="chart-radio-group">
+                <span style="font-size: 0.95rem; color: #555; font-weight: bold; margin-right: 5px;">商品:</span>
+                <label><input type="radio" name="chart8-type" value="all" checked> 全商品分</label>
+                <label><input type="radio" name="chart8-type" value="sticker"> スタンプ</label>
+                <label><input type="radio" name="chart8-type" value="emoji"> 絵文字</label>
+                <label><input type="radio" name="chart8-type" value="theme"> 着せ替え</label>
+            </div>
+            <div class="chart-radio-group">
+                <span style="font-size: 0.95rem; color: #555; font-weight: bold; margin-right: 5px;">売上:</span>
+                <label><input type="radio" name="chart8-sales-type" value="all" checked> 全体</label>
+                <label><input type="radio" name="chart8-sales-type" value="individual"> 個別のみ</label>
+                <label><input type="radio" name="chart8-sales-type" value="premium"> プレミアムのみ</label>
+            </div>
+        </div>
+        <div class="chart-controls-row" style="justify-content: space-between;">
+            <div class="chart-check-group">
+                <label id="chart8-color-code-label">
+                    <input type="checkbox" id="chart8-color-code-checkbox" checked> 内訳で色分けする
+                </label>
+            </div>
+            <div class="chart-radio-group">
+                <span style="font-size: 0.95rem; color: #555; font-weight: bold; margin-right: 5px;">数値表示:</span>
+                <label><input type="radio" name="chart8-amount-display" value="total" checked> 月の合計のみ</label>
+                <label><input type="radio" name="chart8-amount-display" value="detail"> 内訳ごと</label>
+                <label><input type="radio" name="chart8-amount-display" value="none"> 表示しない</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="chart-controls-row">
+            <div class="period-selector">
+                <label for="chart8-start-month">対象期間:</label>
+                <select id="chart8-start-month"></select>
+                <span>〜</span>
+                <select id="chart8-end-month"></select>
+            </div>
+    </div>
+    
+    <div id="chart8-filter-summary" class="chart-filter-summary" aria-live="polite"></div>
+    <div class="chart-container">
+        <canvas id="uniqueCountChart"></canvas>
+    </div>
+    
+    <div class="action-btn-container" data-html2canvas-ignore="true">
+        <div class="export-btn-group">
+            <button type="button" class="btn btn-sm btn-outline" onclick="exportChartImage('uniqueCountChart', 'copy')">📋 画像コピー</button>
+            <button type="button" class="btn btn-sm btn-outline" onclick="exportChartImage('uniqueCountChart', 'download', '売れた種類数の推移.png')">⬇️ PNG保存</button>
+        </div>
+    </div>
+</div>
+
     <script>
         // === Chart.js 背景色白塗りつぶしプラグイン ===
         Chart.register({
@@ -1198,6 +1255,8 @@
         let currentPremMonthProductRankingExport = null;
 
         let itemChartInstance = null;
+	let uniqueCountChartInstance = null;
+        let uniqueCountDataObj = {};
         let itemDataObj = {};
         let itemCountDataObj = {};
         let itemIdNameMap = {};
@@ -1214,6 +1273,13 @@
         const chartArea5 = chartArea4;
         const chartArea7 = document.getElementById('item-analysis-area');
         const summaryArea = document.getElementById('summary-area');
+
+	const chartArea8 = document.getElementById('unique-count-area');
+        const chart8TypeRadios = document.querySelectorAll('input[name="chart8-type"]');
+        const chart8SalesTypeRadios = document.querySelectorAll('input[name="chart8-sales-type"]');
+        const chart8ColorCodeCheckbox = document.getElementById('chart8-color-code-checkbox');
+        const chart8ColorCodeLabel = document.getElementById('chart8-color-code-label');
+        const chart8AmountDisplayRadios = document.querySelectorAll('input[name="chart8-amount-display"]');
         
         const chartTypeRadios = document.querySelectorAll('input[name="chart-type"]');
         const colorCodeLabel = document.getElementById('color-code-label');
@@ -1235,6 +1301,9 @@
 
 	const chart3StartMonthSelect = document.getElementById('chart3-start-month');
         const chart3EndMonthSelect = document.getElementById('chart3-end-month');
+
+	const chart8StartMonthSelect = document.getElementById('chart8-start-month');
+        const chart8EndMonthSelect = document.getElementById('chart8-end-month');
 
         const rankingItemTypeRadios = document.querySelectorAll('input[name="ranking-item-type"]');
         const rankingSalesTypeRadios = document.querySelectorAll('input[name="ranking-sales-type"]');
@@ -1420,6 +1489,61 @@
         }
         chart3StartMonthSelect.addEventListener('change', handleChart3PeriodChange);
         chart3EndMonthSelect.addEventListener('change', handleChart3PeriodChange);
+	function handleChart8PeriodChange(e) {
+            const startVal = chart8StartMonthSelect.value;
+            const endVal = chart8EndMonthSelect.value;
+            if (startVal && endVal && startVal > endVal) {
+                if (e.target.id === 'chart8-start-month') chart8EndMonthSelect.value = startVal;
+                else chart8StartMonthSelect.value = endVal;
+            }
+            if (Object.keys(uniqueCountDataObj).length > 0) drawUniqueCountChart();
+        }
+        chart8StartMonthSelect.addEventListener('change', handleChart8PeriodChange);
+        chart8EndMonthSelect.addEventListener('change', handleChart8PeriodChange);
+
+	function updateChart8ControlsUI() {
+            const viewType = document.querySelector('input[name="chart8-type"]:checked').value;
+            const isColorCoded = chart8ColorCodeCheckbox.checked && !chart8ColorCodeCheckbox.disabled;
+            const isDetailAvailable = (viewType === 'all' && isColorCoded);
+
+            const detailRadio = document.querySelector('input[name="chart8-amount-display"][value="detail"]');
+            if (detailRadio) {
+                detailRadio.disabled = !isDetailAvailable;
+                const label = detailRadio.closest('label');
+                if (label) label.classList.toggle('disabled-label', !isDetailAvailable);
+                
+                if (!isDetailAvailable && detailRadio.checked) {
+                    const totalRadio = document.querySelector('input[name="chart8-amount-display"][value="total"]');
+                    if (totalRadio) totalRadio.checked = true;
+                }
+            }
+        }
+
+        chart8TypeRadios.forEach(radio => radio.addEventListener('change', (e) => {
+            const viewType = e.target.value;
+            if (viewType === 'all') {
+                chart8ColorCodeLabel.classList.remove('disabled-label');
+                chart8ColorCodeCheckbox.disabled = false;
+            } else {
+                chart8ColorCodeLabel.classList.add('disabled-label');
+                chart8ColorCodeCheckbox.disabled = true;
+            }
+            updateChart8ControlsUI();
+            if (Object.keys(uniqueCountDataObj).length > 0) drawUniqueCountChart();
+        }));
+
+        chart8ColorCodeCheckbox.addEventListener('change', () => { 
+            updateChart8ControlsUI();
+            if (Object.keys(uniqueCountDataObj).length > 0) drawUniqueCountChart(); 
+        });
+
+        chart8SalesTypeRadios.forEach(radio => radio.addEventListener('change', () => {
+            if (Object.keys(uniqueCountDataObj).length > 0) drawUniqueCountChart();
+        }));
+
+        chart8AmountDisplayRadios.forEach(radio => radio.addEventListener('change', () => {
+            if (Object.keys(uniqueCountDataObj).length > 0) drawUniqueCountChart();
+        }));
 
         function updateItemAmountDisplayUI() {
             const salesType = document.querySelector('input[name="item-sales-type"]:checked')?.value;
@@ -2094,6 +2218,38 @@
             }
         }
 
+	function aggregateUniqueCountData() {
+            uniqueCountDataObj = {};
+            for (const [itemName, monthData] of Object.entries(rankingDataObj)) {
+                for (const [monthKey, revData] of Object.entries(monthData)) {
+                    if (!uniqueCountDataObj[monthKey]) {
+                        uniqueCountDataObj[monthKey] = {
+                            all: { sticker: 0, emoji: 0, theme: 0 },
+                            individual: { sticker: 0, emoji: 0, theme: 0 },
+                            premium: { sticker: 0, emoji: 0, theme: 0 }
+                        };
+                    }
+                    
+                    const countData = rankingCountDataObj[itemName][monthKey] || { individual: {}, premium: {} };
+                    
+                    ['sticker', 'emoji', 'theme'].forEach(itemType => {
+                        const indRev = revData.individual[itemType] || 0;
+                        const indCount = countData.individual[itemType] || 0;
+                        const premRev = revData.premium[itemType] || 0;
+                        const premCount = countData.premium[itemType] || 0;
+                        
+                        const hasInd = (indRev > 0 || indCount > 0);
+                        const hasPrem = (premRev > 0 || premCount > 0);
+                        
+                        if (hasInd) uniqueCountDataObj[monthKey].individual[itemType]++;
+                        if (hasPrem) uniqueCountDataObj[monthKey].premium[itemType]++;
+                        // 個別かプレミアムどちらかで売れていれば全体の種類数にカウント（重複排除）
+                        if (hasInd || hasPrem) uniqueCountDataObj[monthKey].all[itemType]++;
+                    });
+                }
+            }
+        }
+
         function drawItemChart() {
             const itemId = document.getElementById('item-id-input').value.trim();
             const titleEl = document.getElementById('item-chart-title');
@@ -2205,7 +2361,7 @@
                         y: { stacked: true, beginAtZero: true, grace: '15%', grid: { display: false }, ticks: { display: amountDisplay !== 'none', callback: function(value) { return formatMetric(value); } } }
                     }
                 }
-            });
+            });	    	    
             
             const filterEl = document.getElementById('item-filter-summary');
             const salesLabel = { all: '個別+プレミアム', individual: '個別のみ', premium: 'プレミアムのみ' }[salesType];
@@ -2217,6 +2373,116 @@
             // innerHTMLの最後にプレミアム開始日の表示を追加する
             filterEl.innerHTML = `<span class="summary-prefix">絞り込み：</span>${salesLabel}<br><span class="summary-prefix">リリース日：</span>${releaseDateText}<br><span class="summary-prefix">プレミアム開始日：</span>${premiumDateText}`;
            
+        }
+
+	function drawUniqueCountChart() {
+            const targetArea = document.getElementById('unique-count-area');
+            if (Object.keys(uniqueCountDataObj).length === 0) {
+                targetArea.style.display = 'none';
+                return;
+            }
+            
+            const allLabels = Object.keys(uniqueCountDataObj).sort();
+            let startMonth = chart8StartMonthSelect.value || allLabels[0];
+            let endMonth = chart8EndMonthSelect.value || allLabels[allLabels.length - 1];
+            const labels = getMonthsBetween(startMonth, endMonth);
+            
+            const viewType = document.querySelector('input[name="chart8-type"]:checked').value;
+            const salesType = document.querySelector('input[name="chart8-sales-type"]:checked').value;
+            const isColorCoded = chart8ColorCodeCheckbox.checked && !chart8ColorCodeCheckbox.disabled;
+            const amountDisplayMode = document.querySelector('input[name="chart8-amount-display"]:checked').value;
+
+            const elFilter = document.getElementById('chart8-filter-summary');
+            const itemLabel = { all: '全商品分', sticker: 'スタンプのみ', emoji: '絵文字のみ', theme: '着せ替えのみ' }[viewType];
+            const salesLabel = { all: '全体', individual: '個別のみ', premium: 'プレミアムのみ' }[salesType];
+            const startLabel = formatRankingFilterMonth(startMonth);
+            const endLabel = formatRankingFilterMonth(endMonth);
+            const periodLabel = startMonth === endMonth ? startLabel : `${startLabel}～${endLabel}`;
+            elFilter.innerHTML = `<span class="summary-prefix">絞り込み：</span>${itemLabel}・${salesLabel}・${periodLabel}`;
+
+            const datasets = [];
+            const colorSticker = { bg: 'rgba(157, 199, 147, 0.7)', border: 'rgba(157, 199, 147, 1)' }; 
+            const colorEmoji   = { bg: 'rgba(6, 199, 85, 0.7)', border: 'rgba(6, 199, 85, 1)' }; 
+            const colorTheme   = { bg: 'rgba(30, 110, 30, 0.7)', border: 'rgba(30, 110, 30, 1)' };
+            const colorTotal   = { bg: 'rgba(74, 144, 226, 0.7)', border: 'rgba(74, 144, 226, 1)' };
+
+            const formatValue = (value) => value > 0 ? Math.round(value).toLocaleString() + '種' : '';
+
+            const commonDatalabelsConfig = {
+                display: amountDisplayMode !== 'none', anchor: 'end', align: 'top', color: '#333',
+                font: { weight: 'bold', size: 12 }, formatter: formatValue
+            };
+
+            const detailDatalabelsConfig = {
+                display: amountDisplayMode === 'detail', color: '#fff', font: { weight: 'bold', size: 10 },
+                formatter: formatValue, anchor: 'center', align: 'center',
+                textShadowBlur: 3, textShadowColor: 'rgba(0,0,0,0.5)'
+            };
+
+            const totalDatalabelsConfig = {
+                display: function(context) {
+                    const chart = context.chart;
+                    let lastVisible = -1;
+                    for (let i = chart.data.datasets.length - 1; i >= 0; i--) {
+                        if (chart.isDatasetVisible(i)) { lastVisible = i; break; }
+                    }
+                    return context.datasetIndex === lastVisible;
+                },
+                formatter: function(value, context) {
+                    let sum = 0;
+                    context.chart.data.datasets.forEach((ds, i) => {
+                        if (context.chart.isDatasetVisible(i)) sum += Number(ds.data[context.dataIndex]) || 0;
+                    });
+                    return sum > 0 ? Math.round(sum).toLocaleString() + '種' : '';
+                },
+                anchor: 'end', align: 'top', color: '#333', font: { weight: 'bold', size: 12 }, textShadowBlur: 0
+            };
+
+            let labelConfig = amountDisplayMode === 'detail' ? detailDatalabelsConfig : (amountDisplayMode === 'total' ? totalDatalabelsConfig : { display: false });
+            let isStacked = false;
+
+            const getData = (type) => labels.map(m => uniqueCountDataObj[m][salesType][type]);
+            const stickerData = getData('sticker');
+            const emojiData = getData('emoji');
+            const themeData = getData('theme');
+            const totalData = stickerData.map((v, i) => v + emojiData[i] + themeData[i]);
+
+            if (viewType === 'all') {
+                if (isColorCoded) {
+                    isStacked = true;
+                    if (stickerData.some(v => v > 0)) datasets.push({ label: 'スタンプ', data: stickerData, backgroundColor: colorSticker.bg, borderColor: colorSticker.border, borderWidth: 1, datalabels: labelConfig });
+                    if (emojiData.some(v => v > 0)) datasets.push({ label: '絵文字', data: emojiData, backgroundColor: colorEmoji.bg, borderColor: colorEmoji.border, borderWidth: 1, datalabels: labelConfig });
+                    if (themeData.some(v => v > 0)) datasets.push({ label: '着せ替え', data: themeData, backgroundColor: colorTheme.bg, borderColor: colorTheme.border, borderWidth: 1, datalabels: labelConfig });
+                } else if (totalData.some(v => v > 0)) {
+                    datasets.push({ label: '全商品種類数', data: totalData, backgroundColor: colorTotal.bg, borderColor: colorTotal.border, borderWidth: 1, borderRadius: 4, datalabels: commonDatalabelsConfig });
+                }
+            } else {
+                const targetData = viewType === 'sticker' ? stickerData : viewType === 'emoji' ? emojiData : themeData;
+                const targetColor = viewType === 'sticker' ? colorSticker : viewType === 'emoji' ? colorEmoji : colorTheme;
+                const targetLabel = { sticker: 'スタンプ種類数', emoji: '絵文字種類数', theme: '着せ替え種類数' }[viewType];
+                if (targetData.some(v => v > 0)) {
+                    datasets.push({ label: targetLabel, data: targetData, backgroundColor: targetColor.bg, borderColor: targetColor.border, borderWidth: 1, borderRadius: 4, datalabels: commonDatalabelsConfig });
+                }
+            }
+
+            const ctx = document.getElementById('uniqueCountChart').getContext('2d');
+            if (uniqueCountChartInstance) uniqueCountChartInstance.destroy();
+
+            uniqueCountChartInstance = new Chart(ctx, {
+                type: 'bar', data: { labels: labels, datasets: datasets },
+                options: {
+                    responsive: true, maintainAspectRatio: false, layout: { padding: { top: 25 } },
+                    plugins: {
+                        legend: { display: true },
+                        tooltip: { callbacks: { label: context => (context.dataset.label || '') + ': ' + Math.round(context.parsed.y).toLocaleString() + '種類' } },
+                        datalabels: { display: false } 
+                    },
+                    scales: {
+                        x: { stacked: isStacked, grid: { display: false } },
+                        y: { stacked: isStacked, beginAtZero: true, grace: '15%', grid: { display: false }, ticks: { display: amountDisplayMode !== 'none', callback: value => Math.round(value).toLocaleString() + '種' } }
+                    }
+                }
+            });
         }
 
 
@@ -3359,6 +3625,7 @@
             chartArea3.style.display = 'none';
             chartArea4.style.display = 'none';
             chartArea7.style.display = 'none';
+	    if (chartArea8) chartArea8.style.display = 'none';
             
             document.getElementById('item-id-input').value = '';
             document.getElementById('item-chart-title').textContent = 'Item ID を入力してください';
@@ -3467,6 +3734,10 @@
                 aggregateRankingData(mergedData, header);
                 aggregatePremMonthRankingData(mergedData, header);
                 aggregateItemData(mergedData, header); 
+		
+
+		aggregateUniqueCountData();
+                updateChart8ControlsUI();
                 rankingDataObjOriginal = rankingDataObj;
                 premMonthRankingDataObjOriginal = premMonthRankingDataObj;
 
@@ -3485,6 +3756,8 @@
 
 		    chart3StartMonthSelect.appendChild(new Option(m, m));
                     chart3EndMonthSelect.appendChild(new Option(m, m));
+		    chart8StartMonthSelect.appendChild(new Option(m, m));
+                    chart8EndMonthSelect.appendChild(new Option(m, m));
                 });
 
                 if (availableMonths.length > 0) {
@@ -3509,6 +3782,8 @@
 		    
 	            chart3StartMonthSelect.value = availableMonths[0];
                     chart3EndMonthSelect.value = availableMonths[availableMonths.length - 1];
+                    chart8StartMonthSelect.value = availableMonths[0];
+                    chart8EndMonthSelect.value = availableMonths[availableMonths.length - 1];
                 }
 
                 const sortedPremMonths = Object.keys(premMonthRankingDataObj).sort((a, b) => {
@@ -3594,6 +3869,9 @@
 
                 downloadArea.style.display = 'block';
                 chartArea7.style.display = 'block'; 
+
+		drawUniqueCountChart();
+		if (Object.keys(uniqueCountDataObj).length > 0) chartArea8.style.display = 'block';
                 
                 statusEl.className = 'status success';
                 statusEl.innerHTML = `マージ完了！ 総件数: ${totalRows.toLocaleString()} 行 / プレミアム情報マッチ: ${matchedCount.toLocaleString()} 行`;
